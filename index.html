@@ -14,13 +14,13 @@
 	<div id="inset"></div>
 
 	<script type="module">
-		import * as THREE from '../build/three.module.js';
+		import * as THREE from './libraries/threejs/build/three.module.js';
 
-		import { GUI } from './jsm/libs/dat.gui.module.js';
-		import { OrbitControls } from './jsm/controls/OrbitControls.js';
-		import { NRRDLoader } from './jsm/loaders/NRRDLoader.js';
-		import { VolumeRenderShader1 } from './jsm/shaders/VolumeShader.js';
-		import { WEBGL } from './jsm/WebGL.js';
+		import { GUI } from './libraries/threejs/examples/jsm/loaders/NRRDLoader.js';
+		import { OrbitControls } from './libraries/threejs/examples/jsm/controls/OrbitControls.js';
+		import { NRRDLoader } from './libraries/threejs/examples/jsm/loaders/NRRDLoader.js';
+		import { VolumeRenderShader1 } from './libraries/threejs/examples/jsm/shaders/VolumeShader.js';
+		import { WEBGL } from './libraries/threejs/examples/jsm/WebGL.js';
 
 		if ( WEBGL.isWebGL2Available() === false ) {
 
