@@ -16,7 +16,7 @@
 	<script type="module">
 		import * as THREE from './libraries/threejs/build/three.module.js';
 
-		import { GUI } from './libraries/threejs/examples/jsm/loaders/NRRDLoader.js';
+		import {GUI} from './libraries/threejs/examples/jsm/libs/dat.gui.module.js';
 		import { OrbitControls } from './libraries/threejs/examples/jsm/controls/OrbitControls.js';
 		import { NRRDLoader } from './libraries/threejs/examples/jsm/loaders/NRRDLoader.js';
 		import { VolumeRenderShader1 } from './libraries/threejs/examples/jsm/shaders/VolumeShader.js';
@@ -80,7 +80,7 @@
 			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 
 			// Load the data ...
-			new NRRDLoader().load( "models/nrrd/stent.nrrd", function ( volume ) {
+			new NRRDLoader().load( "./libraries/threejs/examples/models/nrrd/stent.nrrd", function ( volume ) {
 
 				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
 				// THREEJS will select R32F (33326) based on the THREE.RedFormat and THREE.FloatType.
@@ -94,8 +94,8 @@
 
 				// Colormap textures
 				cmtextures = {
-					viridis: new THREE.TextureLoader().load( 'textures/cm_viridis.png', render ),
-					gray: new THREE.TextureLoader().load( 'textures/cm_gray.png', render )
+					viridis: new THREE.TextureLoader().load( './libraries/threejs/examples/textures/cm_viridis.png', render ),
+					gray: new THREE.TextureLoader().load( './libraries/threejs/examples/textures/cm_gray.png', render )
 				};
 
 				// Material
