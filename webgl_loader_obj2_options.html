@@ -6,6 +6,8 @@
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
 		<script src="./data/Segment_of_vascular_tree_organ/segmentedObjectFiles.js"></script>
+		<script src="./data/Postnatal_anatomical_structure/Postnatal_anatomical_structure.js"></script>
+
 		<style>
 			#glFullscreen {
 				width: 100%;
@@ -233,7 +235,7 @@
 
 				useLoadParallel: function (modelName) {
 					//let modelName = 'WaltHead';
-					const testFolder = './data/Segment_of_vascular_tree_organ/';
+					const testFolder = './data/Postnatal_anatomical_structure/';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
 					let local = new THREE.Object3D();
@@ -437,9 +439,9 @@
 					//this.useLoadMain();
 
 					// Load a file with OBJLoader2Parallel.load in parallel in worker
-					for (let currentObject in segmentedObjectFiles) {
-						console.log(segmentedObjectFiles[currentObject])
-						this.useLoadParallel(segmentedObjectFiles[currentObject]);
+					for (let currentObject in Postnatal_anatomical_structure) {
+						console.log(Postnatal_anatomical_structure[currentObject]);
+						this.useLoadParallel(Postnatal_anatomical_structure[currentObject]);
 					}
 
 					// Load a file with OBJLoader2Parallel.load on main with fallback to OBJLoader2.parse

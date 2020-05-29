@@ -1,4 +1,4 @@
-let segmentedObjectFiles = ["MM419_BP51898_FMA7108_Interatrial septum.obj",
+let Postnatal_anatomical_structure = ["MM419_BP51898_FMA7108_Interatrial septum.obj",
 "MM420_BP51969_FMA74912_Trunk of anterior interventricular branch of left coronary artery.obj",
 "MM422_BP51972_FMA3860_Diagonal branch of anterior descending branch of left coronary artery.obj",
 "MM423_BP51965_FMA3888_Second left anterior branch of anterior interventricular branch of left coronary artery.obj",
@@ -125,6 +125,5 @@ let segmentedObjectFiles = ["MM419_BP51898_FMA7108_Interatrial septum.obj",
 "MM635_BP51973_FMA74923_Trunk of circumflex branch of left coronary artery.obj",
 "MM636_BP51794_FMA7264_Anterior papillary muscle of left ventricle.obj",
 "MM637_BP51868_FMA9345_Septal wall of left ventricle.obj",
-"MM638_BP51995_FMA4712_Posterior vein of left ventricle.obj",
-" // */
+"MM638_BP51995_FMA4712_Posterior vein of left ventricle.obj"
 ];
