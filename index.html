@@ -30,7 +30,6 @@
     import {MeshPhongMaterial} from "./libraries/threejs/src/materials/MeshPhongMaterial.js";
 
 
-
     import {TrackballControls} from "./libraries/threejs/examples/jsm/controls/TrackballControls.js";
     import {VertexNormalsHelper} from "./libraries/threejs/examples/jsm/helpers/VertexNormalsHelper.js";
 
@@ -162,14 +161,14 @@
 
             let scope = this;
 
-            let material = new MeshPhongMaterial( { color: modelInfos.Class });
+            let material = new MeshPhongMaterial({color: modelInfos.Class, opacity: 0.5, transparent: true});
 
             function callbackOnLoad(object3d, message) {
-                object3d.traverse( function( child ) {
-                    if ( child instanceof THREE.Mesh ) {
+                object3d.traverse(function (child) {
+                    if (child instanceof THREE.Mesh) {
                         child.material = material;
                     }
-                } );
+                });
                 local.add(object3d);
 
                 //local.add(material);
@@ -178,40 +177,9 @@
             }
 
 
-
             //objLoader2Parallel.addMaterials(, true)
             objLoader2Parallel.load(testFolder + modelName, callbackOnLoad);
             return local;
-        },
-
-
-        guiMeshPhongMaterial: function (gui, mesh, material, geometry) {
-            // material = new MeshPhongMaterial( { color: 0x2194CE } );
-            var data = {
-                color: material.color.getHex(),
-                emissive: material.emissive.getHex(),
-                specular: material.specular.getHex(),
-                envMaps: envMapKeys[0],
-                map: diffuseMapKeys[0],
-                alphaMap: alphaMapKeys[0]
-            };
-
-            var folder = gui.addFolder('THREE.MeshPhongMaterial');
-
-            folder.addColor(data, 'color').onChange(handleColorChange(material.color));
-            folder.addColor(data, 'emissive').onChange(handleColorChange(material.emissive));
-            folder.addColor(data, 'specular').onChange(handleColorChange(material.specular));
-
-            folder.add(material, 'shininess', 0, 100);
-            folder.add(material, 'flatShading').onChange(needsUpdate(material, geometry));
-            folder.add(material, 'wireframe');
-            folder.add(material, 'wireframeLinewidth', 0, 10);
-            folder.add(material, 'vertexColors').onChange(needsUpdate(material, geometry));
-            folder.add(material, 'fog');
-            folder.add(data, 'envMaps', envMapKeys).onChange(updateTexture(material, 'envMap', envMaps));
-            folder.add(data, 'map', diffuseMapKeys).onChange(updateTexture(material, 'map', diffuseMaps));
-            folder.add(data, 'alphaMap', alphaMapKeys).onChange(updateTexture(material, 'alphaMap', alphaMaps));
-
         },
 
 
@@ -319,14 +287,25 @@
         executeLoading: function () {
             // Load a file with OBJLoader2Parallel.load in parallel in worker
             let partsModels = [];
-            //Postnatal_anatomical_structure = [{Filename: "MM420_BP51969_FMA74912_Trunk of anterior interventricular branch of left coronary artery.obj", Class : "red"}]; // TODO remove this line
+            // Postnatal_anatomical_structure = [{Filename: "MM420_BP51969_FMA74912_Trunk of anterior interventricular branch of left coronary artery.obj", Class : "red"}]; // TODO remove this line
             for (let currentObject in Postnatal_anatomical_structure) {
                 let organName = Postnatal_anatomical_structure[currentObject].Filename.replace('.obj', '').split("_");
                 partsModels[organName[organName.length - 1]] = this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[organName.length - 1]);
             }
-            console.log(partsModels)
+
+            setTimeout(() => {
+                changeColor(partsModels, "Trunk of anterior interventricular branch of left coronary artery")
+            }, 2000);
         }
     };
+
+    function changeColor(partsModels, name) {
+        let material = new MeshPhongMaterial({color: "white", opacity: 1.0, transparent: true}); // a new one must be crated
+        partsModels[name].children[0].children[0].material = material;
+        partsModels[name].children[0].children[0].geometry.uvsNeedUpdate = true;
+        partsModels[name].needsUpdate = true;
+    }
+
 
     let app = new WWOBJLoader2Example(document.getElementById('example'));
 
