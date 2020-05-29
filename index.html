@@ -1,222 +1,172 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>three.js webgl - OBJLoader2 basic usage</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-    <link type="text/css" rel="stylesheet" href="main.css">
-    <script src="./data/Segment_of_vascular_tree_organ/segmentedObjectFiles.js"></script>
-
-    <style>
-        #glFullscreen {
-            width: 100%;
-            height: 100vh;
-            min-width: 640px;
-            min-height: 360px;
-            position: relative;
-            overflow: hidden;
-            z-index: 0;
-        }
-
-        #example {
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background-color: #000000;
-        }
-
-        #feedback {
-            color: darkorange;
-        }
-
-        #dat {
-            user-select: none;
-            position: absolute;
-            left: 0;
-            top: 0;
-            z-Index: 200;
-        }
-    </style>
-
+	<title>three.js webgl - volume rendering example</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<link type="text/css" rel="stylesheet" href="main.css">
 </head>
 
 <body>
-<div id="glFullscreen">
-    <canvas id="example"></canvas>
-</div>
-<div id="dat">
+	<div id="info">
+		<a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - Float volume render test (mip / isosurface)
+	</div>
+	<div id="inset"></div>
 
-</div>
-<div id="info">
-    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 direct loader test
-    <div id="feedback"></div>
-</div>
+	<script type="module">
+		import * as THREE from './libraries/threejs/build/three.module.js';
 
-<script type="module">
+		import {GUI} from './libraries/threejs/examples/jsm/libs/dat.gui.module.js';
+		import { OrbitControls } from './libraries/threejs/examples/jsm/controls/OrbitControls.js';
+		import { NRRDLoader } from './libraries/threejs/examples/jsm/loaders/NRRDLoader.js';
+		import { VolumeRenderShader1 } from './libraries/threejs/examples/jsm/shaders/VolumeShader.js';
+		import { WEBGL } from './libraries/threejs/examples/jsm/WebGL.js';
 
-    'use strict';
+		if ( WEBGL.isWebGL2Available() === false ) {
 
-    import * as THREE from './libraries/threejs/build/three.module.js';
+			document.body.appendChild( WEBGL.getWebGL2ErrorMessage() );
 
-    import {TrackballControls} from "./libraries/threejs/examples/jsm/controls/TrackballControls.js";
+		}
 
-    import {MTLLoader} from "./libraries/threejs/examples/jsm/loaders/MTLLoader.js";
-    import {OBJLoader2} from "./libraries/threejs/examples/jsm/loaders/OBJLoader2.js";
-    import {MtlObjBridge} from "./libraries/threejs/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js";
+		var renderer,
+			scene,
+			camera,
+			controls,
+			material,
+			volconfig,
+			cmtextures;
 
+		init();
 
-    const OBJLoader2Example = function (elementToBindTo) {
-        this.renderer = null;
-        this.canvas = elementToBindTo;
-        this.aspectRatio = 1;
-        this.recalcAspectRatio();
+		function init() {
 
-        this.scene = null;
-        this.cameraDefaults = {
-            posCamera: new THREE.Vector3(0.0, 175.0, 500.0),
-            posCameraTarget: new THREE.Vector3(0, 0, 0),
-            near: 0.1,
-            far: 10000,
-            fov: 45
-        };
-        this.camera = null;
-        this.cameraTarget = this.cameraDefaults.posCameraTarget;
+			scene = new THREE.Scene();
 
-        this.controls = null;
-    };
+			// Create renderer
+			var canvas = document.createElement( 'canvas' );
+			var context = canvas.getContext( 'webgl2', { alpha: false, antialias: false } );
+			renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
+			renderer.setPixelRatio( window.devicePixelRatio );
+			renderer.setSize( window.innerWidth, window.innerHeight );
+			document.body.appendChild( renderer.domElement );
 
-    OBJLoader2Example.prototype = {
+			// Create camera (The volume renderer does not work very well with perspective yet)
+			var h = 512; // frustum height
+			var aspect = window.innerWidth / window.innerHeight;
+			camera = new THREE.OrthographicCamera( - h * aspect / 2, h * aspect / 2, h / 2, - h / 2, 1, 1000 );
+			camera.position.set( 0, 0, 128 );
+			camera.up.set( 0, 0, 1 ); // In our data, z is up
 
-        constructor: OBJLoader2Example,
+			// Create controls
+			controls = new OrbitControls( camera, renderer.domElement );
+			controls.addEventListener( 'change', render );
+			controls.target.set( 64, 64, 128 );
+			controls.minZoom = 0.5;
+			controls.maxZoom = 4;
+			controls.update();
 
-        initGL: function () {
-            this.renderer = new THREE.WebGLRenderer({
-                canvas: this.canvas,
-                antialias: true,
-                autoClear: true
-            });
-            this.renderer.setClearColor(0x050505);
+			// scene.add( new AxesHelper( 128 ) );
 
-            this.scene = new THREE.Scene();
+			// Lighting is baked into the shader a.t.m.
+			// var dirLight = new DirectionalLight( 0xffffff );
 
-            this.camera = new THREE.PerspectiveCamera(this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far);
-            this.resetCamera();
-            this.controls = new TrackballControls(this.camera, this.renderer.domElement);
+			// The gui for interaction
+			volconfig = { clim1: 0, clim2: 1, renderstyle: 'iso', isothreshold: 0.15, colormap: 'viridis' };
+			var gui = new GUI();
+			gui.add( volconfig, 'clim1', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'clim2', 0, 1, 0.01 ).onChange( updateUniforms );
+			gui.add( volconfig, 'colormap', { gray: 'gray', viridis: 'viridis' } ).onChange( updateUniforms );
+			gui.add( volconfig, 'renderstyle', { mip: 'mip', iso: 'iso' } ).onChange( updateUniforms );
+			gui.add( volconfig, 'isothreshold', 0, 1, 0.01 ).onChange( updateUniforms );
 
-            let ambientLight = new THREE.AmbientLight(0x404040);
-            let directionalLight1 = new THREE.DirectionalLight(0xC0C090);
-            let directionalLight2 = new THREE.DirectionalLight(0xC0C090);
+			// Load the data ...
+			new NRRDLoader().load( "./libraries/threejs/examples/models/nrrd/stent.nrrd", function ( volume ) {
 
-            directionalLight1.position.set(-100, -50, 100);
-            directionalLight2.position.set(100, 50, -100);
+				// Texture to hold the volume. We have scalars, so we put our data in the red channel.
+				// THREEJS will select R32F (33326) based on the THREE.RedFormat and THREE.FloatType.
+				// Also see https://www.khronos.org/registry/webgl/specs/latest/2.0/#TEXTURE_TYPES_FORMATS_FROM_DOM_ELEMENTS_TABLE
+				// TODO: look the dtype up in the volume metadata
+				var texture = new THREE.DataTexture3D( volume.data, volume.xLength, volume.yLength, volume.zLength );
+				texture.format = THREE.RedFormat;
+				texture.type = THREE.FloatType;
+				texture.minFilter = texture.magFilter = THREE.LinearFilter;
+				texture.unpackAlignment = 1;
 
-            this.scene.add(directionalLight1);
-            this.scene.add(directionalLight2);
-            this.scene.add(ambientLight);
+				// Colormap textures
+				cmtextures = {
+					viridis: new THREE.TextureLoader().load( './libraries/threejs/examples/textures/cm_viridis.png', render ),
+					gray: new THREE.TextureLoader().load( './libraries/threejs/examples/textures/cm_gray.png', render )
+				};
 
-            let helper = new THREE.GridHelper(1200, 60, 0xFF4444, 0x404040);
-            this.scene.add(helper);
-        },
+				// Material
+				var shader = VolumeRenderShader1;
 
-        initContent: function () {
-            let modelName = 'female02';
-            this._reportProgress({detail: {text: 'Loading: ' + modelName}});
+				var uniforms = THREE.UniformsUtils.clone( shader.uniforms );
 
+				uniforms[ "u_data" ].value = texture;
+				uniforms[ "u_size" ].value.set( volume.xLength, volume.yLength, volume.zLength );
+				uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
+				uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+				uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
+				uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
 
-            let scope = this;
-            let objLoader2 = new OBJLoader2();
-            let callbackOnLoad = function (object3d) {
-                scope.scene.add(object3d);
-                console.log('Loading complete: ' + modelName);
-                scope._reportProgress({detail: {text: ''}});
-            };
+				material = new THREE.ShaderMaterial( {
+					uniforms: uniforms,
+					vertexShader: shader.vertexShader,
+					fragmentShader: shader.fragmentShader,
+					side: THREE.BackSide // The volume shader uses the backface as its "reference point"
+				} );
 
-            const testFolder = './data/Segment_of_vascular_tree_organ';
-            for (let currentObject in segmentedObjectFiles) {
-                console.log(segmentedObjectFiles[currentObject]);
-                let onLoadMtl = function (mtlParseResult) {
-                    objLoader2.setModelName(modelName);
-                    objLoader2.setLogging(true, true);
-                    objLoader2.addMaterials(MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult), true);
+				// THREE.Mesh
+				var geometry = new THREE.BoxBufferGeometry( volume.xLength, volume.yLength, volume.zLength );
+				geometry.translate( volume.xLength / 2 - 0.5, volume.yLength / 2 - 0.5, volume.zLength / 2 - 0.5 );
 
-                    objLoader2.load(testFolder + segmentedObjectFiles[currentObject], callbackOnLoad, null, null, null);
-                };
+				var mesh = new THREE.Mesh( geometry, material );
+				scene.add( mesh );
 
-                //let mtlLoader = new MTLLoader();
-                //mtlLoader.load( './libraries/threejs/examples/models/obj/female02/female02.mtl', onLoadMtl );
+				render();
 
+			} );
 
-                let loader = new THREE.TextureLoader();
-                loader.load('./libraries/threejs/examples/textures/uv_grid_opengl.jpg', onLoadMtl);
-            }
+			window.addEventListener( 'resize', onWindowResize, false );
 
-        },
+		}
 
-        _reportProgress: function (event) {
-            let output = '';
-            if (event.detail !== null && event.detail !== undefined && event.detail.text) {
+		function updateUniforms() {
 
-                output = event.detail.text;
+			material.uniforms[ "u_clim" ].value.set( volconfig.clim1, volconfig.clim2 );
+			material.uniforms[ "u_renderstyle" ].value = volconfig.renderstyle == 'mip' ? 0 : 1; // 0: MIP, 1: ISO
+			material.uniforms[ "u_renderthreshold" ].value = volconfig.isothreshold; // For ISO renderstyle
+			material.uniforms[ "u_cmdata" ].value = cmtextures[ volconfig.colormap ];
 
-            }
-            console.log('Progress: ' + output);
-            document.getElementById('feedback').innerHTML = output;
-        },
+			render();
 
-        resizeDisplayGL: function () {
-            this.controls.handleResize();
+		}
 
-            this.recalcAspectRatio();
-            this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight, false);
+		function onWindowResize() {
 
-            this.updateCamera();
-        },
+			renderer.setSize( window.innerWidth, window.innerHeight );
 
-        recalcAspectRatio: function () {
-            this.aspectRatio = (this.canvas.offsetHeight === 0) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
-        },
+			var aspect = window.innerWidth / window.innerHeight;
 
-        resetCamera: function () {
-            this.camera.position.copy(this.cameraDefaults.posCamera);
-            this.cameraTarget.copy(this.cameraDefaults.posCameraTarget);
+			var frustumHeight = camera.top - camera.bottom;
 
-            this.updateCamera();
-        },
+			camera.left = - frustumHeight * aspect / 2;
+			camera.right = frustumHeight * aspect / 2;
 
-        updateCamera: function () {
-            this.camera.aspect = this.aspectRatio;
-            this.camera.lookAt(this.cameraTarget);
-            this.camera.updateProjectionMatrix();
-        },
+			camera.updateProjectionMatrix();
 
-        render: function () {
-            if (!this.renderer.autoClear) this.renderer.clear();
-            this.controls.update();
-            this.renderer.render(this.scene, this.camera);
-        }
-    };
+			render();
 
-    let app = new OBJLoader2Example(document.getElementById('example'));
+		}
 
-    let resizeWindow = function () {
-        app.resizeDisplayGL();
-    };
+		function render() {
 
-    let render = function () {
-        requestAnimationFrame(render);
-        app.render();
-    };
+			renderer.render( scene, camera );
 
-    window.addEventListener('resize', resizeWindow, false);
+		}
 
-    console.log('Starting initialisation phase...');
-    app.initGL();
-    app.resizeDisplayGL();
-    app.initContent();
+	</script>
 
-    render();
-
-</script>
 </body>
 </html>
