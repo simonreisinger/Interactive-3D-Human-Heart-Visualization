@@ -162,7 +162,7 @@
 
             let scope = this;
 
-            let material = new MeshPhongMaterial( { color: 0x2194CE });
+            let material = new MeshPhongMaterial( { color: modelInfos.Class });
 
             function callbackOnLoad(object3d, message) {
                 object3d.traverse( function( child ) {
@@ -310,13 +310,9 @@
                 for (let name in materials) {
 
                     if (materials.hasOwnProperty(name)) this.traversalFunction(materials[name]);
-
                 }
-
             } else if (object3d.material) {
-
                 this.traversalFunction(object3d.material);
-
             }
         },
 
@@ -329,9 +325,7 @@
                 partsModels[organName[organName.length - 1]] = this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[organName.length - 1]);
             }
             console.log(partsModels)
-
         }
-
     };
 
     let app = new WWOBJLoader2Example(document.getElementById('example'));
