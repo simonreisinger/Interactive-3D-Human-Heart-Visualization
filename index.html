@@ -134,21 +134,21 @@
 
             const testFolder = './data/Segment_of_vascular_tree_organ';
             for (let currentObject in segmentedObjectFiles) {
-                console.log(segmentedObjectFiles[currentObject])
-            let onLoadMtl = function (mtlParseResult) {
-                objLoader2.setModelName(modelName);
-                objLoader2.setLogging(true, true);
-                objLoader2.addMaterials(MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult), true);
+                console.log(segmentedObjectFiles[currentObject]);
+                let onLoadMtl = function (mtlParseResult) {
+                    objLoader2.setModelName(modelName);
+                    objLoader2.setLogging(true, true);
+                    objLoader2.addMaterials(MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult), true);
 
                     objLoader2.load(testFolder + segmentedObjectFiles[currentObject], callbackOnLoad, null, null, null);
-            };
+                };
 
-            //let mtlLoader = new MTLLoader();
-            //mtlLoader.load( './libraries/threejs/examples/models/obj/female02/female02.mtl', onLoadMtl );
+                //let mtlLoader = new MTLLoader();
+                //mtlLoader.load( './libraries/threejs/examples/models/obj/female02/female02.mtl', onLoadMtl );
 
 
-            let loader = new THREE.TextureLoader();
-            loader.load('./libraries/threejs/examples/textures/uv_grid_opengl.jpg', onLoadMtl);
+                let loader = new THREE.TextureLoader();
+                loader.load('./libraries/threejs/examples/textures/uv_grid_opengl.jpg', onLoadMtl);
             }
 
         },

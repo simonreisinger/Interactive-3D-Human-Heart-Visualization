@@ -50,17 +50,17 @@
 
 			'use strict';
 
-			import * as THREE from '../build/three.module.js';
-			import { GUI } from './jsm/libs/dat.gui.module.js';
+			import * as THREE from './libraries/threejs/build/three.module.js';
+			import { GUI } from './libraries/threejs/examples/jsm/libs/dat.gui.module.js';
 
-			import { TrackballControls } from "./jsm/controls/TrackballControls.js";
-			import { VertexNormalsHelper } from "./jsm/helpers/VertexNormalsHelper.js";
+			import { TrackballControls } from "./libraries/threejs/examples/jsm/controls/TrackballControls.js";
+			import { VertexNormalsHelper } from "./libraries/threejs/examples/jsm/helpers/VertexNormalsHelper.js";
 
-			import { MTLLoader } from "./jsm/loaders/MTLLoader.js";
-			import { MtlObjBridge } from "./jsm/loaders/obj2/bridge/MtlObjBridge.js";
-			import { OBJLoader2 } from "./jsm/loaders/OBJLoader2.js";
-			import { OBJLoader2Parallel } from "./jsm/loaders/OBJLoader2Parallel.js";
-			import { LoadedMeshUserOverride } from "./jsm/loaders/obj2/shared/MeshReceiver.js";
+			import { MTLLoader } from "./libraries/threejs/examples/jsm/loaders/MTLLoader.js";
+			import { MtlObjBridge } from "./libraries/threejs/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js";
+			import { OBJLoader2 } from "./libraries/threejs/examples/jsm/loaders/OBJLoader2.js";
+			import { OBJLoader2Parallel } from "./libraries/threejs/examples/jsm/loaders/OBJLoader2Parallel.js";
+			import { LoadedMeshUserOverride } from "./libraries/threejs/examples/jsm/loaders/obj2/shared/MeshReceiver.js";
 
 			const WWOBJLoader2Example = function ( elementToBindTo ) {
 				this.renderer = null;
@@ -147,7 +147,7 @@
 						let fileLoader = new THREE.FileLoader();
 						fileLoader.setPath( '' );
 						fileLoader.setResponseType( 'arraybuffer' );
-						fileLoader.load( 'models/obj/female02/female02.obj',
+						fileLoader.load( './libraries/threejs/examples/models/obj/female02/female02.obj',
 							function ( content, message ) {
 								let local = new THREE.Object3D();
 								local.name = 'Pivot_female02';
@@ -162,7 +162,7 @@
 					}
 
 					let mtlLoader = new MTLLoader();
-					mtlLoader.load( 'models/obj/female02/female02.mtl', onLoadMtl );
+					mtlLoader.load( './libraries/threejs/examples/models/obj/female02/female02.mtl', onLoadMtl );
 				},
 
 				useParseParallel: function () {
@@ -194,7 +194,7 @@
 					let fileLoader = new THREE.FileLoader();
 					fileLoader.setPath( '' );
 					fileLoader.setResponseType( 'arraybuffer' );
-					fileLoader.load( 'models/obj/female02/female02_vertex_colors.obj',
+					fileLoader.load( './libraries/threejs/examples/models/obj/female02/female02_vertex_colors.obj',
 						function ( content ) {
 							objLoader2Parallel.parse( content );
 						}
@@ -223,11 +223,11 @@
 
 					function onLoadMtl ( mtlParseResult ) {
 						objLoader2.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ), true );
-						objLoader2.load( 'models/obj/male02/male02.obj', callbackOnLoad, null, null, null );
+						objLoader2.load( './libraries/threejs/examples/models/obj/male02/male02.obj', callbackOnLoad, null, null, null );
 					}
 
 					let mtlLoader = new MTLLoader();
-					mtlLoader.load( 'models/obj/male02/male02.mtl', onLoadMtl );
+					mtlLoader.load( './libraries/threejs/examples/models/obj/male02/male02.mtl', onLoadMtl );
 				},
 
 				useLoadParallel: function () {
@@ -253,11 +253,11 @@
 					}
 					function onLoadMtl ( mtlParseResult ) {
 						objLoader2Parallel.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ), true );
-						objLoader2Parallel.load( 'models/obj/walt/WaltHead.obj', callbackOnLoad );
+						objLoader2Parallel.load( './libraries/threejs/examples/models/obj/walt/WaltHead.obj', callbackOnLoad );
 					}
 
 					let mtlLoader = new MTLLoader();
-					mtlLoader.load( 'models/obj/walt/WaltHead.mtl', onLoadMtl );
+					mtlLoader.load( './libraries/threejs/examples/models/obj/walt/WaltHead.mtl', onLoadMtl );
 				},
 
 				useLoadMainFallback: function () {
@@ -279,7 +279,7 @@
 						scope.finalize();
 					}
 
-					objLoader2Parallel.load( 'models/obj/cerberus/Cerberus.obj', callbackOnLoad );
+					objLoader2Parallel.load( './libraries/threejs/examples/models/obj/cerberus/Cerberus.obj', callbackOnLoad );
 				},
 
 				useLoadParallelMeshAlter: function () {
@@ -317,7 +317,7 @@
 						scope.finalize();
 					}
 
-					objLoader2Parallel.load( 'models/obj/ninja/ninjaHead_Low.obj', callbackOnLoad );
+					objLoader2Parallel.load( './libraries/threejs/examples/models/obj/ninja/ninjaHead_Low.obj', callbackOnLoad );
 				},
 
 				finalize: function () {
@@ -432,16 +432,16 @@
 					this.useParseParallel();
 
 					// Load a file with OBJLoader.load on main
-					this.useLoadMain();
+					//this.useLoadMain();
 
 					// Load a file with OBJLoader2Parallel.load in parallel in worker
-					this.useLoadParallel();
+					//this.useLoadParallel();
 
 					// Load a file with OBJLoader2Parallel.load on main with fallback to OBJLoader2.parse
-					this.useLoadMainFallback();
+					//this.useLoadMainFallback();
 
 					// Load a file with OBJLoader2Parallel.load in parallel in worker and add normals during onMeshAlter
-					this.useLoadParallelMeshAlter();
+					//this.useLoadParallelMeshAlter();
 				}
 
 			};

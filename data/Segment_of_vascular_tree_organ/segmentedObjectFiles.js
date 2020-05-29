@@ -30,5 +30,5 @@ let segmentedObjectFiles = ["MM420_BP51969_FMA74912_Trunk of anterior interventr
     "MM610_BP51926_FMA3902_Left marginal artery.obj",
     "MM634_BP51951_FMA4706_Coronary sinus.obj",
     "MM635_BP51973_FMA74923_Trunk of circumflex branch of left coronary artery.obj",
-    "MM638_BP51995_FMA4712_Posterior vein of left ventricle.obj",
-]
+    "MM638_BP51995_FMA4712_Posterior vein of left ventricle.obj" // */
+];
