@@ -27,6 +27,10 @@
     import * as THREE from './libraries/threejs/build/three.module.js';
     import {GUI} from './libraries/threejs/examples/jsm/libs/dat.gui.module.js';
 
+    import {MeshPhongMaterial} from "./libraries/threejs/src/materials/MeshPhongMaterial.js";
+
+
+
     import {TrackballControls} from "./libraries/threejs/examples/jsm/controls/TrackballControls.js";
     import {VertexNormalsHelper} from "./libraries/threejs/examples/jsm/helpers/VertexNormalsHelper.js";
 
@@ -140,11 +144,11 @@
             mtlLoader.load('./libraries/threejs/examples/models/obj/female02/female02.mtl', onLoadMtl);
         },
 
-        useLoadParallel: function (modelInfos) {
+        useLoadParallel: function (modelInfos, organName) {
             let modelName = modelInfos.Filename;
             let color = modelInfos.Class;
             const testFolder = './data/Postnatal_anatomical_structure/';
-            this._reportProgress({detail: {text: 'Loading: ' + modelName}});
+            this._reportProgress({detail: {text: 'Loading: ' + organName}});
 
             let local = new THREE.Object3D();
             local.name = 'Pivot_WaltHead';
@@ -153,27 +157,63 @@
             local.scale.set(scale, scale, scale);
             this.pivot.add(local);
 
-            let objLoader2Parallel = new OBJLoader2Parallel()
-                .setModelName(modelName)
+            let objLoader2Parallel = new OBJLoader2Parallel().setModelName(modelName)
                 .setJsmWorker(this.useJsmWorker, new URL(OBJLoader2Parallel.DEFAULT_JSM_WORKER_PATH, window.location.href));
 
             let scope = this;
 
+            let material = new MeshPhongMaterial( { color: 0x2194CE });
+
             function callbackOnLoad(object3d, message) {
+                object3d.traverse( function( child ) {
+                    if ( child instanceof THREE.Mesh ) {
+                        child.material = material;
+                    }
+                } );
                 local.add(object3d);
+
+                //local.add(material);
                 scope._reportProgress({detail: {text: 'Loading of ' + modelName + ' completed: ' + message}});
                 scope.finalize();
             }
 
-            function onLoadMtl(mtlParseResult) {
-                objLoader2Parallel.addMaterials(MtlObjBridge.addMaterialsFromMtlLoader(mtlParseResult), true);
-                objLoader2Parallel.load(testFolder + modelName, callbackOnLoad);
-                //console.log(objLoader2Parallel)
-            }
 
-            let mtlLoader = new MTLLoader();
-            mtlLoader.load('./libraries/threejs/examples/models/obj/walt/WaltHead.mtl', onLoadMtl);
+
+            //objLoader2Parallel.addMaterials(, true)
+            objLoader2Parallel.load(testFolder + modelName, callbackOnLoad);
+            return local;
         },
+
+
+        guiMeshPhongMaterial: function (gui, mesh, material, geometry) {
+            // material = new MeshPhongMaterial( { color: 0x2194CE } );
+            var data = {
+                color: material.color.getHex(),
+                emissive: material.emissive.getHex(),
+                specular: material.specular.getHex(),
+                envMaps: envMapKeys[0],
+                map: diffuseMapKeys[0],
+                alphaMap: alphaMapKeys[0]
+            };
+
+            var folder = gui.addFolder('THREE.MeshPhongMaterial');
+
+            folder.addColor(data, 'color').onChange(handleColorChange(material.color));
+            folder.addColor(data, 'emissive').onChange(handleColorChange(material.emissive));
+            folder.addColor(data, 'specular').onChange(handleColorChange(material.specular));
+
+            folder.add(material, 'shininess', 0, 100);
+            folder.add(material, 'flatShading').onChange(needsUpdate(material, geometry));
+            folder.add(material, 'wireframe');
+            folder.add(material, 'wireframeLinewidth', 0, 10);
+            folder.add(material, 'vertexColors').onChange(needsUpdate(material, geometry));
+            folder.add(material, 'fog');
+            folder.add(data, 'envMaps', envMapKeys).onChange(updateTexture(material, 'envMap', envMaps));
+            folder.add(data, 'map', diffuseMapKeys).onChange(updateTexture(material, 'map', diffuseMaps));
+            folder.add(data, 'alphaMap', alphaMapKeys).onChange(updateTexture(material, 'alphaMap', alphaMaps));
+
+        },
+
 
         finalize: function () {
             this.loadCount--;
@@ -223,12 +263,9 @@
 
         render: function () {
             if (!this.renderer.autoClear) this.renderer.clear();
-
             this.controls.update();
-
             this.cube.rotation.x += 0.05;
             this.cube.rotation.y += 0.05;
-
             this.renderer.render(this.scene, this.camera);
         },
 
@@ -249,6 +286,7 @@
             scope.pivot.traverse(scopeTraverse);
         },
 
+        // TODO just double side
         alterDouble: function () {
             let scope = this;
             scope.doubleSide = !scope.doubleSide;
@@ -284,9 +322,13 @@
 
         executeLoading: function () {
             // Load a file with OBJLoader2Parallel.load in parallel in worker
+            let partsModels = [];
+            //Postnatal_anatomical_structure = [{Filename: "MM420_BP51969_FMA74912_Trunk of anterior interventricular branch of left coronary artery.obj", Class : "red"}]; // TODO remove this line
             for (let currentObject in Postnatal_anatomical_structure) {
-                this.useLoadParallel(Postnatal_anatomical_structure[currentObject]);
+                let organName = Postnatal_anatomical_structure[currentObject].Filename.replace('.obj', '').split("_");
+                partsModels[organName[organName.length - 1]] = this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[organName.length - 1]);
             }
+            console.log(partsModels)
 
         }
 

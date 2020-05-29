@@ -1,4 +1,4 @@
-let Postnatal_anatomical_structure = [{Filename: "MM419_BP51898_FMA7108_Interatrial septum.obj", Class : "brown"},
+var Postnatal_anatomical_structure = [{Filename: "MM419_BP51898_FMA7108_Interatrial septum.obj", Class : "brown"},
 {Filename: "MM420_BP51969_FMA74912_Trunk of anterior interventricular branch of left coronary artery.obj", Class : "red"},
 {Filename: "MM422_BP51972_FMA3860_Diagonal branch of anterior descending branch of left coronary artery.obj", Class : "red"},
 {Filename: "MM423_BP51965_FMA3888_Second left anterior branch of anterior interventricular branch of left coronary artery.obj", Class : "red"},
