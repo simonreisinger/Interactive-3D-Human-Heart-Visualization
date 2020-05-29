@@ -5,6 +5,7 @@
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
 		<link type="text/css" rel="stylesheet" href="main.css">
+		<script src="./data/Segment_of_vascular_tree_organ/segmentedObjectFiles.js"></script>
 		<style>
 			#glFullscreen {
 				width: 100%;
@@ -230,14 +231,15 @@
 					mtlLoader.load( './libraries/threejs/examples/models/obj/male02/male02.mtl', onLoadMtl );
 				},
 
-				useLoadParallel: function () {
-					let modelName = 'WaltHead';
+				useLoadParallel: function (modelName) {
+					//let modelName = 'WaltHead';
+					const testFolder = './data/Segment_of_vascular_tree_organ/';
 					this._reportProgress( { detail: { text: 'Loading: ' + modelName } } );
 
 					let local = new THREE.Object3D();
 					local.name = 'Pivot_WaltHead';
-					local.position.set( -175, 50, 0 );
-					let scale = 0.5;
+					local.position.set( 0, 150, -1100 );
+					let scale = 1.0;
 					local.scale.set( scale, scale, scale );
 					this.pivot.add( local );
 
@@ -253,7 +255,7 @@
 					}
 					function onLoadMtl ( mtlParseResult ) {
 						objLoader2Parallel.addMaterials( MtlObjBridge.addMaterialsFromMtlLoader( mtlParseResult ), true );
-						objLoader2Parallel.load( './libraries/threejs/examples/models/obj/walt/WaltHead.obj', callbackOnLoad );
+						objLoader2Parallel.load( testFolder + modelName, callbackOnLoad );
 					}
 
 					let mtlLoader = new MTLLoader();
@@ -426,16 +428,19 @@
 
 				executeLoading: function () {
 					// Load a file with OBJLoader2.parse on main
-					this.useParseMain();
+					//this.useParseMain();
 
 					// Load a file with OBJLoader2Parallel.parse in parallel in worker
-					this.useParseParallel();
+					//this.useParseParallel();
 
 					// Load a file with OBJLoader.load on main
 					//this.useLoadMain();
 
 					// Load a file with OBJLoader2Parallel.load in parallel in worker
-					//this.useLoadParallel();
+					for (let currentObject in segmentedObjectFiles) {
+						console.log(segmentedObjectFiles[currentObject])
+						this.useLoadParallel(segmentedObjectFiles[currentObject]);
+					}
 
 					// Load a file with OBJLoader2Parallel.load on main with fallback to OBJLoader2.parse
 					//this.useLoadMainFallback();
