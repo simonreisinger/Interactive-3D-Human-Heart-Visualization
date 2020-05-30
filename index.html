@@ -251,8 +251,6 @@ document.addEventListener("click", closeAllSelect);
                 scope.finalize();
             }
 
-
-            //objLoader2Parallel.addMaterials(, true)
             objLoader2Parallel.load(testFolder + modelName, callbackOnLoad);
             return local;
         },
@@ -261,18 +259,14 @@ document.addEventListener("click", closeAllSelect);
         finalize: function () {
             this.loadCount--;
             if (this.loadCount === 0) {
-
                 this._reportProgress({detail: {text: ''}});
-
             }
         },
 
         _reportProgress: function (event) {
             let output = '';
             if (event.detail !== null && event.detail !== undefined && event.detail.text) {
-
                 output = event.detail.text;
-
             }
             console.log('Progress: ' + output);
             document.getElementById('feedback').innerHTML = output;
@@ -280,10 +274,8 @@ document.addEventListener("click", closeAllSelect);
 
         resizeDisplayGL: function () {
             this.controls.handleResize();
-
             this.recalcAspectRatio();
             this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight, false);
-
             this.updateCamera();
         },
 
@@ -294,7 +286,6 @@ document.addEventListener("click", closeAllSelect);
         resetCamera: function () {
             this.camera.position.copy(this.cameraDefaults.posCamera);
             this.cameraTarget.copy(this.cameraDefaults.posCameraTarget);
-
             this.updateCamera();
         },
 
@@ -348,7 +339,6 @@ document.addEventListener("click", closeAllSelect);
 
         traverseScene: function (object3d) {
             if (Array.isArray(object3d.material)) {
-
                 let materials = object3d.material.materials;
                 for (let name in materials) {
 
@@ -360,32 +350,40 @@ document.addEventListener("click", closeAllSelect);
         },
 
         executeLoading: function () {
-
             // Postnatal_anatomical_structure = [{Filename: "MM420_BP51969_FMA74912_Trunk of anterior interventricular branch of left coronary artery.obj", Class : "red"}]; // TODO remove this line
             for (let currentObject in Postnatal_anatomical_structure) {
                 let organName = Postnatal_anatomical_structure[currentObject].Filename.replace('.obj', '').split("_");
                 partsModels[organName[organName.length - 1]] = this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[organName.length - 1]);
             }
-            setTimeout(() => {
-                changeColor(partsModels, "Trunk of anterior interventricular branch of left coronary artery")
-            }, 2000);
         }
     };
 
     let partsModels = [];
 
-    function changeColor(name) {
-        console.log(name);
-        console.log(partsModels[name]);
-        let material = new MeshPhongMaterial({color: "rgb(0,255,0)", opacity: 1.0, transparent: true}); // a new one must be crated
-        console.log(partsModels[name].children[0].children[0].material);
-        partsModels[name].children[0].children[0].material = material;
-        partsModels[name].children[0].children[0].geometry.uvsNeedUpdate = true;
-        partsModels[name].needsUpdate = true;
+    function emphasizeOrgan(name) {
+        changeAllMaterial(0.05);
+        changeMaterial(name, 1.0);
     }
 
-    function printSomething(stringPrinted) {
-        console.log(stringPrinted)
+    function changeAllMaterial(opacity) {
+        for (let currentName in partsModels) {
+            changeMaterial(currentName, opacity)
+        }
+    }
+
+    function changeMaterial(name, opacity) {
+        let materialColor = partsModels[name].children[0].children[0].material.color; // "rgb(0,255,0)";
+        let currentOpacity = partsModels[name].children[0].children[0].material.opacity; // "rgb(0,255,0)";
+        if (currentOpacity !== opacity) {
+            let material = new MeshPhongMaterial({color: materialColor, opacity: opacity, transparent: true});
+            partsModels[name].children[0].children[0].material = material;
+            partsModels[name].children[0].children[0].geometry.uvsNeedUpdate = true;
+            partsModels[name].needsUpdate = true;
+        }
+    }
+
+    function resetMaterial() {
+        changeAllMaterial(1.0)
     }
 
 
@@ -466,12 +464,11 @@ document.addEventListener("click", closeAllSelect);
     element.addEventListener('change', updateValue);
 
     function updateValue(e) {
-        console.log(partsModels);
-
-        console.log(e);
-        console.log(e.target.value);
-        console.log(partsModels[e.target.value]);
-        changeColor(e.target.value);
+        if (e.target.value === "") {
+            resetMaterial();
+        } else {
+            emphasizeOrgan(e.target.value);
+        }
     }
 
     /*
