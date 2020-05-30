@@ -1,3 +1,28 @@
+/*Source: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_vertical_menu_scroll*/
+.vertical-menu {
+    width: 200px;
+    height: 150px;
+    overflow-y: auto;
+}
+
+.vertical-menu a {
+    background-color: #eee;
+    color: black;
+    display: block;
+    padding: 12px;
+    text-decoration: none;
+}
+
+.vertical-menu a:hover {
+    background-color: #ccc;
+}
+
+.vertical-menu a.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+
 /*the container must be positioned relative:*/
 .custom-select {
     position: relative;

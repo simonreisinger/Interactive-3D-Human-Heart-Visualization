@@ -13,7 +13,7 @@
 
 <body>
 <!--surround the select box with a "custom-select" DIV element. Remember to set the width:-->
-<div class="custom-select" style="width:300px;float:right; z-index: 100;">
+<div class="vertical-menu" style="width:300px;float:right; z-index: 100;">
     <select id="Organs">
         <option value="0">Select organ:</option>
         <option value="1">Show all</option>
@@ -33,13 +33,11 @@
 
 <script> // MENU
 console.log("MENU SCRIPT");
-var i = 2;
 
 let menu = document.getElementById("Organs");
 for (let currentObject in Postnatal_anatomical_structure) {
     let organName = Postnatal_anatomical_structure[currentObject].Filename.replace('.obj', '').split("_");
-    menu.add(new Option(organName[organName.length - 1],i),undefined);
-    i += 1;
+    menu.add(new Option(organName[organName.length - 1], organName[organName.length - 1]), undefined);
 
     //partsModels[organName[organName.length - 1]] = this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[organName.length - 1]);
 }
@@ -126,9 +124,11 @@ function closeAllSelect(elmnt) {
 then close all select boxes:*/
 document.addEventListener("click", closeAllSelect);
 
+
 </script>
 
 <script type="module">
+
 
     'use strict';
 
@@ -360,24 +360,32 @@ document.addEventListener("click", closeAllSelect);
         },
 
         executeLoading: function () {
-            let partsModels = [];
+
             // Postnatal_anatomical_structure = [{Filename: "MM420_BP51969_FMA74912_Trunk of anterior interventricular branch of left coronary artery.obj", Class : "red"}]; // TODO remove this line
             for (let currentObject in Postnatal_anatomical_structure) {
                 let organName = Postnatal_anatomical_structure[currentObject].Filename.replace('.obj', '').split("_");
                 partsModels[organName[organName.length - 1]] = this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[organName.length - 1]);
             }
-
             setTimeout(() => {
                 changeColor(partsModels, "Trunk of anterior interventricular branch of left coronary artery")
             }, 2000);
         }
     };
 
-    function changeColor(partsModels, name) {
-        let material = new MeshPhongMaterial({color: "white", opacity: 1.0, transparent: true}); // a new one must be crated
+    let partsModels = [];
+
+    function changeColor(name) {
+        console.log(name);
+        console.log(partsModels[name]);
+        let material = new MeshPhongMaterial({color: "rgb(0,255,0)", opacity: 1.0, transparent: true}); // a new one must be crated
+        console.log(partsModels[name].children[0].children[0].material);
         partsModels[name].children[0].children[0].material = material;
         partsModels[name].children[0].children[0].geometry.uvsNeedUpdate = true;
         partsModels[name].needsUpdate = true;
+    }
+
+    function printSomething(stringPrinted) {
+        console.log(stringPrinted)
     }
 
 
@@ -452,6 +460,29 @@ document.addEventListener("click", closeAllSelect);
         app.render();
     }
 
+    let element = document.getElementById("Organs");
+    console.log(element);
+
+    element.addEventListener('change', updateValue);
+
+    function updateValue(e) {
+        console.log(partsModels);
+
+        console.log(e);
+        console.log(e.target.value);
+        console.log(partsModels[e.target.value]);
+        changeColor(e.target.value);
+    }
+
+    /*
+    element.onchange = function selectObject(selectObject) {
+        let value = selectObject.value;
+        console.log(selectObject);
+        console.log(selectObject.target.value);
+
+        //printSomething(value)
+    };*/
+
     window.addEventListener('resize', resizeWindow, false);
 
     console.log('Starting initialisation phase...');
@@ -460,6 +491,7 @@ document.addEventListener("click", closeAllSelect);
 
     // kick render loop
     render();
+    app.executeLoading();
     //*/
 </script>
 
