@@ -13,3 +13,5 @@ Medical_Vis 2
 # TODOs
 * Transparency still has artifacts
 * add bloom to emphasize organ
+* Make UI more beautiful
+* add explanation for selected organ
