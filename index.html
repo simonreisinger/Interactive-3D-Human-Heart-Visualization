@@ -375,7 +375,7 @@ document.addEventListener("click", closeAllSelect);
 
     function emphasizeOrgan(currentName) {
         //TODO add glow
-        changeAllMaterial(0.0);
+        changeAllMaterial(0.3);
         for (let i in nameAndID){
             if (nameAndID[i] === currentName){
                 changeMaterial(i, 1.0);
@@ -408,7 +408,7 @@ document.addEventListener("click", closeAllSelect);
             transparent: true,
             depthTest: true
         });
-        material.depthWrite = false;
+        //material.depthWrite = false;
         partsModels[ID].children[0].children[0].material = material;
         partsModels[ID].children[0].children[0].geometry.uvsNeedUpdate = true;
         partsModels[ID].needsUpdate = true;
