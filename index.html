@@ -15,8 +15,8 @@
 <!--surround the select box with a "custom-select" DIV element. Remember to set the width:-->
 <div class="vertical-menu" style="width:300px;float:right; z-index: 100;">
     <select id="Organs">
-        <option value="0">Select organ:</option>
-        <option value="1">Show all</option>
+        <option value="Select organ:">Select organ:</option>
+        <option value="Show all">Show all</option>
     </select>
 </div>
 
@@ -33,14 +33,6 @@
 
 <script> // MENU
 console.log("MENU SCRIPT");
-
-let menu = document.getElementById("Organs");
-for (let currentObject in Postnatal_anatomical_structure) {
-    let organName = Postnatal_anatomical_structure[currentObject].Filename.replace('.obj', '').split("_");
-    menu.add(new Option(organName[organName.length - 1], organName[organName.length - 1]), undefined);
-
-    //partsModels[organName[organName.length - 1]] = this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[organName.length - 1]);
-}
 
 
 var x, i, j, l, ll, selElmnt, a, b, c;
@@ -136,7 +128,7 @@ document.addEventListener("click", closeAllSelect);
     import {GUI} from './libraries/threejs/examples/jsm/libs/dat.gui.module.js';
 
     import {MeshPhongMaterial} from "./libraries/threejs/src/materials/MeshPhongMaterial.js";
-
+    import {MeshPhysicalMaterial} from "./libraries/threejs/src/materials/MeshPhysicalMaterial.js";
 
     import {TrackballControls} from "./libraries/threejs/examples/jsm/controls/TrackballControls.js";
     import {VertexNormalsHelper} from "./libraries/threejs/examples/jsm/helpers/VertexNormalsHelper.js";
@@ -146,7 +138,7 @@ document.addEventListener("click", closeAllSelect);
     import {OBJLoader2} from "./libraries/threejs/examples/jsm/loaders/OBJLoader2.js";
     import {OBJLoader2Parallel} from "./libraries/threejs/examples/jsm/loaders/OBJLoader2Parallel.js";
     import {LoadedMeshUserOverride} from "./libraries/threejs/examples/jsm/loaders/obj2/shared/MeshReceiver.js";
-    //*
+
     const WWOBJLoader2Example = function (elementToBindTo) {
         this.renderer = null;
         this.canvas = elementToBindTo;
@@ -218,10 +210,11 @@ document.addEventListener("click", closeAllSelect);
             this.scene.add(this.pivot);
         },
 
-        useLoadParallel: function (modelInfos, organName) {
+        useLoadParallel: function (modelInfos, ID, organName) {
             let modelName = modelInfos.Filename;
             let color = modelInfos.Class;
             const testFolder = './data/Postnatal_anatomical_structure/';
+            //const testFolder = './data/test/';
             this._reportProgress({detail: {text: 'Loading: ' + organName}});
 
             let local = new THREE.Object3D();
@@ -236,7 +229,8 @@ document.addEventListener("click", closeAllSelect);
 
             let scope = this;
 
-            let material = new MeshPhongMaterial({color: modelInfos.Class, opacity: 0.5, transparent: true});
+            let material = new MeshPhongMaterial({color: modelInfos.Class, opacity: 1.0, transparent: true});
+
 
             function callbackOnLoad(object3d, message) {
                 object3d.traverse(function (child) {
@@ -252,7 +246,9 @@ document.addEventListener("click", closeAllSelect);
             }
 
             objLoader2Parallel.load(testFolder + modelName, callbackOnLoad);
-            return local;
+            //console.log(modelName);
+            partsModels[ID] = local;
+            console.log(partsModels)
         },
 
 
@@ -351,34 +347,82 @@ document.addEventListener("click", closeAllSelect);
 
         executeLoading: function () {
             // Postnatal_anatomical_structure = [{Filename: "MM420_BP51969_FMA74912_Trunk of anterior interventricular branch of left coronary artery.obj", Class : "red"}]; // TODO remove this line
+            //var ii = 0;
+
+
+            //Postnatal_anatomical_structure = [{Filename: "MM633_BP51882_FMA9542_Posterior wall of left atrium.obj", Class : "brown"}];
+            let menu = document.getElementById("Organs");
             for (let currentObject in Postnatal_anatomical_structure) {
+                //console.log("Load Object: " + ii + " " + organName[organName.length - 1]);
+                //ii += 1;
+
                 let organName = Postnatal_anatomical_structure[currentObject].Filename.replace('.obj', '').split("_");
-                partsModels[organName[organName.length - 1]] = this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[organName.length - 1]);
+                this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[0], organName[organName.length - 1]);
+                menu.add(new Option(organName[organName.length - 1], organName[organName.length - 1]), undefined);
+                nameAndID[organName[0]] = organName[organName.length - 1];
             }
+            console.log(partsModels)
+            console.log(nameAndID)
         }
     };
 
     let partsModels = [];
+    let nameAndID = [];
 
-    function emphasizeOrgan(name) {
-        changeAllMaterial(0.05);
-        changeMaterial(name, 1.0);
+    function isString(obj) {
+        return !isNaN(obj)
     }
 
-    function changeAllMaterial(opacity) {
-        for (let currentName in partsModels) {
-            changeMaterial(currentName, opacity)
+    function emphasizeOrgan(currentName) {
+        //TODO add glow
+        changeAllMaterial(0.0);
+        for (let i in nameAndID){
+            if (nameAndID[i] === currentName){
+                changeMaterial(i, 1.0);
+            }
+
         }
     }
 
-    function changeMaterial(name, opacity) {
-        let materialColor = partsModels[name].children[0].children[0].material.color; // "rgb(0,255,0)";
-        let currentOpacity = partsModels[name].children[0].children[0].material.opacity; // "rgb(0,255,0)";
-        if (currentOpacity !== opacity) {
-            let material = new MeshPhongMaterial({color: materialColor, opacity: opacity, transparent: true});
-            partsModels[name].children[0].children[0].material = material;
-            partsModels[name].children[0].children[0].geometry.uvsNeedUpdate = true;
-            partsModels[name].needsUpdate = true;
+    function changeAllMaterial(opacity) {
+        console.log(partsModels)
+        console.log(partsModels.length)
+        var i = 0;
+        for (let currentID in nameAndID) {
+            console.log(i + " " + currentID);
+            i = i + 1;
+            changeMaterial(currentID, opacity)
+        }
+    }
+
+    function changeMaterial(ID, opacity) {
+        console.log(ID)
+        console.log(partsModels)
+        let materialColor = partsModels[ID].children[0].children[0].material.color; // "rgb(0,255,0)";
+        let currentOpacity = partsModels[ID].children[0].children[0].material.opacity;
+
+        //TODO if already the correct values donot redraw
+        let material = new MeshPhongMaterial({
+            color: materialColor,
+            opacity: opacity,
+            transparent: true,
+            depthTest: true
+        });
+        material.depthWrite = false;
+        partsModels[ID].children[0].children[0].material = material;
+        partsModels[ID].children[0].children[0].geometry.uvsNeedUpdate = true;
+        partsModels[ID].needsUpdate = true;
+    }
+
+    let element_selector = document.getElementById("Organs");
+
+    element_selector.addEventListener('change', updateValue);
+
+    function updateValue(e) {
+        if (e.target.value === "Select organ:" || e.target.value === "Show all") {
+            resetMaterial();
+        } else {
+            emphasizeOrgan(e.target.value);
         }
     }
 
@@ -457,28 +501,6 @@ document.addEventListener("click", closeAllSelect);
         requestAnimationFrame(render);
         app.render();
     }
-
-    let element = document.getElementById("Organs");
-    console.log(element);
-
-    element.addEventListener('change', updateValue);
-
-    function updateValue(e) {
-        if (e.target.value === "") {
-            resetMaterial();
-        } else {
-            emphasizeOrgan(e.target.value);
-        }
-    }
-
-    /*
-    element.onchange = function selectObject(selectObject) {
-        let value = selectObject.value;
-        console.log(selectObject);
-        console.log(selectObject.target.value);
-
-        //printSomething(value)
-    };*/
 
     window.addEventListener('resize', resizeWindow, false);
 
