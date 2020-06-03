@@ -32,8 +32,6 @@
 
 
 <script> // MENU
-console.log("MENU SCRIPT");
-
 
 var x, i, j, l, ll, selElmnt, a, b, c;
 /*look for any elements with the class "custom-select":*/
@@ -99,7 +97,7 @@ function closeAllSelect(elmnt) {
     xl = x.length;
     yl = y.length;
     for (i = 0; i < yl; i++) {
-        if (elmnt == y[i]) {
+        if (elmnt === y[i]) {
             arrNo.push(i)
         } else {
             y[i].classList.remove("select-arrow-active");
@@ -129,12 +127,6 @@ document.addEventListener("click", closeAllSelect);
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 
 			}
-
-
-
-
-
-
 </script>
 
 <script type="x-shader/x-fragment" id="fragmentshader">
@@ -155,9 +147,6 @@ document.addEventListener("click", closeAllSelect);
 				gl_FragColor = ( getTexture( baseTexture ) + vec4( 1.0 ) * getTexture( bloomTexture ) );
 
 			}
-
-
-
 
 
 
@@ -196,20 +185,26 @@ document.addEventListener("click", closeAllSelect);
     bloomLayer.set(BLOOM_SCENE);
     let materials = {};
     let darkMaterial = new THREE.MeshBasicMaterial({color: "black"});
-    let raycaster = new THREE.Raycaster();
     let mouse = new THREE.Vector2();
+    console.log(window)
+
+    let cubeMaterial = new THREE.MeshNormalMaterial();
+    let cubeGeometry = new THREE.BoxBufferGeometry(10, 10, 10);
+    let cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    cube.position.set(0, 0, 0);
+    cube.layers.toggle(BLOOM_SCENE);
+
 
     const WWOBJLoader2Example = function (elementToBindTo) {
 
         this.params = {
             exposure: 1,
-            bloomStrength: 5,
+            bloomStrength: 1.3,
             bloomThreshold: 0,
             bloomRadius: 0,
             scene: "Scene with Glow"
         };
-
-        this.material = null;
+        this.raycaster = new THREE.Raycaster();
         this.finalComposer = null;
         this.renderer = null;
         this.bloomComposer = null;
@@ -235,7 +230,6 @@ document.addEventListener("click", closeAllSelect);
         this.useJsmWorker = false;
         this.loadCount = 6;
 
-        this.cube = null;
         this.pivot = null;
     };
 
@@ -251,7 +245,7 @@ document.addEventListener("click", closeAllSelect);
             });
             this.renderer.setPixelRatio(window.devicePixelRatio);
             this.renderer.setClearColor(0x050505);
-            this.renderer.setSize(window.innerWidth, window.innerHeight);
+            this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
 
             this.scene = new THREE.Scene();
 
@@ -270,16 +264,10 @@ document.addEventListener("click", closeAllSelect);
             this.scene.add(directionalLight2);
             this.scene.add(ambientLight);
 
-            let helper = new THREE.GridHelper(1200, 60, 0xFF4444, 0x404040);
-            this.scene.add(helper);
+            //let helper = new THREE.GridHelper(1200, 60, 0xFF4444, 0x404040);
+            //this.scene.add(helper);
 
-            let geometry = new THREE.BoxBufferGeometry(10, 10, 10);
-            let material = new THREE.MeshNormalMaterial();
-            this.cube = new THREE.Mesh(geometry, material);
-            this.cube.position.set(0, 0, 0);
-            this.cube.layers.toggle(BLOOM_SCENE);
-            console.log(this.cube)
-            this.scene.add(this.cube);
+            this.scene.add(cube);
 
             this.pivot = new THREE.Object3D();
             this.pivot.name = 'Pivot';
@@ -314,8 +302,6 @@ document.addEventListener("click", closeAllSelect);
             this.finalComposer.addPass(renderScene);
             this.finalComposer.addPass(finalPass);
 
-            //window.addEventListener( 'click', this.onDocumentMouseClick, false );
-
 
         },
 
@@ -340,7 +326,6 @@ document.addEventListener("click", closeAllSelect);
 
             let material = new MeshPhongMaterial({color: modelInfos.Class, opacity: 1.0, transparent: true});
 
-
             function callbackOnLoad(object3d, message) {
                 object3d.traverse(function (child) {
                     if (child instanceof THREE.Mesh) {
@@ -349,7 +334,6 @@ document.addEventListener("click", closeAllSelect);
                 });
                 local.add(object3d);
 
-                //local.add(material);
                 scope._reportProgress({detail: {text: 'Loading of ' + modelName + ' completed: ' + message}});
                 scope.finalize();
             }
@@ -357,9 +341,6 @@ document.addEventListener("click", closeAllSelect);
             objLoader2Parallel.load(testFolder + modelName, callbackOnLoad);
             //console.log(modelName);
             partsModels[ID] = local;
-            console.log(partsModels)
-
-
         },
 
 
@@ -380,9 +361,12 @@ document.addEventListener("click", closeAllSelect);
         },
 
         resizeDisplayGL: function () {
+            console.log("resizeDisplayGL")
             this.controls.handleResize();
             this.recalcAspectRatio();
             this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight, false);
+            this.bloomComposer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
+            this.finalComposer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
             this.updateCamera();
         },
 
@@ -419,25 +403,6 @@ document.addEventListener("click", closeAllSelect);
 
         },
 
-        onDocumentMouseClick: function (event) {
-
-            event.preventDefault();
-
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-
-            raycaster.setFromCamera(mouse, this.camera);
-            let intersects = raycaster.intersectObjects(scene.children);
-            if (intersects.length > 0) {
-
-                let object = intersects[0].object;
-                object.layers.toggle(BLOOM_SCENE);
-                render();
-
-            }
-
-        },
-
         darkenNonBloomed: function (obj) {
             if (obj.isMesh && bloomLayer.test(obj.layers) === false) {
 
@@ -462,9 +427,10 @@ document.addEventListener("click", closeAllSelect);
         render: function () {
             if (!this.renderer.autoClear) this.renderer.clear();
             this.controls.update();
-            this.cube.rotation.x += 0.05;
-            this.cube.rotation.y += 0.05;
-            //this.renderer.render(this.scene, this.camera);
+
+            cube.rotation.x += 0.05;
+            cube.rotation.y += 0.05;
+
             switch (this.params.scene) {
 
                 case 'Scene only':
@@ -548,11 +514,35 @@ document.addEventListener("click", closeAllSelect);
             }
             console.log(partsModels)
             console.log(nameAndID)
+        },
+
+        onDocumentMouseClick_object: function (event) {
+            console.log("onDocumentMouseClick_object")
+
+            event.preventDefault();
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1 + 0.25;
+
+            this.raycaster.setFromCamera(mouse, this.camera);
+            let intersects = this.raycaster.intersectObjects(this.pivot.children, true);
+
+            if (intersects.length > 0) {
+                let object = intersects[0].object;
+                //object.layers.toggle(BLOOM_SCENE); // make object bloom
+                object.visible = false;
+                this.render();
+            }
         }
     };
 
     let partsModels = [];
     let nameAndID = [];
+
+    function onDocumentMouseClick(currentName) {
+        app.onDocumentMouseClick_object(currentName);
+    }
+
 
     function emphasizeOrgan(currentName) {
         //TODO add glow
@@ -567,10 +557,11 @@ document.addEventListener("click", closeAllSelect);
     }
 
     function changeAllMaterial(opacity) {
-        var i = 0;
+        let i = 0;
         for (let currentID in nameAndID) {
             console.log(i + " " + currentID);
             i = i + 1;
+            partsModels[currentID].children[0].children[0].visible = true;
             changeMaterial(currentID, opacity)
         }
     }
@@ -592,8 +583,23 @@ document.addEventListener("click", closeAllSelect);
         partsModels[ID].needsUpdate = true;
     }
 
-    let element_selector = document.getElementById("Organs");
+    function changeMaterialOfObject(object, opacity) {
+        let materialColor = object.material.color; // "rgb(0,255,0)";
+        let currentOpacity = object.material.opacity;
 
+        let material = new MeshPhongMaterial({
+            color: materialColor,
+            opacity: opacity,
+            transparent: true,
+            depthTest: true
+        });
+        object.material = material;
+        object.geometry.uvsNeedUpdate = true;
+        object.needsUpdate = true;
+    }
+
+
+    let element_selector = document.getElementById("Organs");
     element_selector.addEventListener('change', updateValue);
 
     function updateValue(e) {
@@ -607,7 +613,6 @@ document.addEventListener("click", closeAllSelect);
     function resetMaterial() {
         changeAllMaterial(1.0)
     }
-
 
     let app = new WWOBJLoader2Example(document.getElementById('example'));
 
@@ -662,6 +667,7 @@ document.addEventListener("click", closeAllSelect);
         console.log('Setting useJsmWorker to: ' + value);
         app.useJsmWorker = value;
     });
+
     let folderExecution = gui.addFolder('Execution');
     handleExecuteLoading = folderExecution.add(wwObjLoader2Control, 'executeLoading').name('Run');
     handleExecuteLoading.domElement.id = 'startButton';
@@ -669,11 +675,11 @@ document.addEventListener("click", closeAllSelect);
     folderObjLoader2ParallelOptions.open();
     folderExecution.open();
 
-
     // init three.js example application
     function resizeWindow() {
         app.resizeDisplayGL();
     }
+
 
     function render() {
         requestAnimationFrame(render);
@@ -681,6 +687,7 @@ document.addEventListener("click", closeAllSelect);
     }
 
     window.addEventListener('resize', resizeWindow, false);
+    window.addEventListener('click', onDocumentMouseClick, false);
 
     console.log('Starting initialisation phase...');
     app.initGL();
@@ -689,7 +696,8 @@ document.addEventListener("click", closeAllSelect);
     // kick render loop
     render();
     app.executeLoading();
-    //*/
+
+
 </script>
 
 </body>
