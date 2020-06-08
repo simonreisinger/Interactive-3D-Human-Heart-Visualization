@@ -1,3 +1,14 @@
+div.wikipediainfo{
+    color: #1b1b1b;
+    z-index:5;
+    width: 20%;
+    height: 80%;
+    background-color: white;
+    position:fixed;
+    right:0;
+    bottom:0;
+}
+
 body {
     margin: 0;
     background-color: #000;
