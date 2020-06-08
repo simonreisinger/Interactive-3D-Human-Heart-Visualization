@@ -126,9 +126,7 @@ document.addEventListener("click", closeAllSelect);
 				vUv = uv;
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-
 			}
-
 </script>
 
 <script type="x-shader/x-fragment" id="fragmentshader">
@@ -149,10 +147,6 @@ document.addEventListener("click", closeAllSelect);
 				gl_FragColor = ( getTexture( baseTexture ) + vec4( 1.0 ) * getTexture( bloomTexture ) );
 
 			}
-
-
-
-
 </script>
 <script type="module">
 
@@ -515,12 +509,9 @@ document.addEventListener("click", closeAllSelect);
                 menu.add(new Option(organName[organName.length - 1], organName[organName.length - 1]), undefined);
                 nameAndID[organName[0]] = organName[organName.length - 1];
             }
-            console.log(partsModels)
-            console.log(nameAndID)
         },
 
         onDocumentMouseClick_object: function (event) {
-            console.log("onDocumentMouseClick_object")
 
             event.preventDefault();
 
@@ -531,9 +522,18 @@ document.addEventListener("click", closeAllSelect);
             let intersects = this.raycaster.intersectObjects(this.pivot.children, true);
 
             if (intersects.length > 0) {
-                let object = intersects[0].object;
+                console.log(intersects)
+                for (i in intersects) {
+                    console.log(i)
+                    let object = intersects[0].object;
+                    console.log(object.visible)
+                    if (object.visible) {
+                        console.log(object.visible)
+                        object.visible = false;
+                        break;
+                    }
+                }
                 //object.layers.toggle(BLOOM_SCENE); // make object bloom
-                object.visible = false;
                 this.render();
             }
         }
@@ -599,16 +599,11 @@ document.addEventListener("click", closeAllSelect);
         object.geometry.uvsNeedUpdate = true;
         object.needsUpdate = true;
     }
-
-
     let element_selector = document.getElementById("Organs");
     element_selector.addEventListener('change', updateValue);
 
-
     function removeDivByID(divid) {
-        // <div id="wikipediainfo">
         $("div").remove(divid);
-
     }
 
     function updateValue(e) {
