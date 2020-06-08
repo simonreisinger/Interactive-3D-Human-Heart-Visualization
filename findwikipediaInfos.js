@@ -1,8 +1,8 @@
 // https://codepen.io/jasonchan/pen/JXwONj
 // http://jsfiddle.net/fm0vxg32/
 function loadWikipediaPreview(currentName){
-    var searchTerm = "Posterior_vein_of_the_left_ventricle";
-    var url = "https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&page="+ searchTerm +"&callback=?";
+    //searchTerm = "Posterior_vein_of_the_left_ventricle";
+    var url = "https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&page="+ currentName +"&callback=?";
     //$("<div class='wikipediainfo'> <h3>"+ currentName + "</h3> </div>").appendTo('body');
 
     $.ajax({
