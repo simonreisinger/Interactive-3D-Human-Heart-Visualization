@@ -328,6 +328,7 @@ document.addEventListener("click", closeAllSelect);
                     if (child instanceof THREE.Mesh) {
                         child.material = material;
                     }
+                    object3d.userData = {name: modelName};
                 });
                 local.add(object3d);
 
@@ -336,7 +337,6 @@ document.addEventListener("click", closeAllSelect);
             }
 
             objLoader2Parallel.load(testFolder + modelName, callbackOnLoad);
-            //console.log(modelName);
             partsModels[ID] = local;
         },
 
@@ -405,9 +405,7 @@ document.addEventListener("click", closeAllSelect);
 
                 materials[obj.uuid] = obj.material;
                 obj.material = darkMaterial;
-
             }
-
         },
 
         restoreMaterial: function (obj) {
@@ -525,7 +523,7 @@ document.addEventListener("click", closeAllSelect);
                 console.log(intersects)
                 for (i in intersects) {
                     console.log(i)
-                    let object = intersects[0].object;
+                    let object = intersects[i].object;
                     console.log(object.visible)
                     if (object.visible) {
                         console.log(object.visible)
@@ -554,6 +552,8 @@ document.addEventListener("click", closeAllSelect);
             if (nameAndID[ID] === currentName) {
                 //changeMaterial(i, 1.0);
                 partsModels[ID].children[0].children[0].layers.toggle(BLOOM_SCENE);
+            } else {
+                //partsModels[ID].children[0].children[0].layers.toggle(ENTIRE_SCENE);
             }
         }
     }
