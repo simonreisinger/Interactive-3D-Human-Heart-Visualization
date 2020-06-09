@@ -127,6 +127,7 @@ document.addEventListener("click", closeAllSelect);
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 			}
+
 </script>
 
 <script type="x-shader/x-fragment" id="fragmentshader">
@@ -147,6 +148,7 @@ document.addEventListener("click", closeAllSelect);
 				gl_FragColor = ( getTexture( baseTexture ) + vec4( 1.0 ) * getTexture( bloomTexture ) );
 
 			}
+
 </script>
 <script type="module">
 
@@ -395,9 +397,7 @@ document.addEventListener("click", closeAllSelect);
                 this.camera.layers.set(BLOOM_SCENE);
                 this.bloomComposer.render();
                 this.camera.layers.set(ENTIRE_SCENE);
-
             }
-
         },
 
         darkenNonBloomed: function (obj) {
@@ -442,7 +442,6 @@ document.addEventListener("click", closeAllSelect);
                     // render the entire scene, then render bloom scene on top
                     this.finalComposer.render();
                     break;
-
             }
         },
 
@@ -522,16 +521,12 @@ document.addEventListener("click", closeAllSelect);
             if (intersects.length > 0) {
                 console.log(intersects)
                 for (i in intersects) {
-                    console.log(i)
                     let object = intersects[i].object;
-                    console.log(object.visible)
                     if (object.visible) {
-                        console.log(object.visible)
                         object.visible = false;
                         break;
                     }
                 }
-                //object.layers.toggle(BLOOM_SCENE); // make object bloom
                 this.render();
             }
         }
@@ -561,7 +556,6 @@ document.addEventListener("click", closeAllSelect);
     function changeAllMaterial(opacity) {
         let i = 0;
         for (let currentID in nameAndID) {
-            console.log(i + " " + currentID);
             i = i + 1;
             partsModels[currentID].children[0].children[0].visible = true;
             changeMaterial(currentID, opacity)
@@ -599,6 +593,7 @@ document.addEventListener("click", closeAllSelect);
         object.geometry.uvsNeedUpdate = true;
         object.needsUpdate = true;
     }
+
     let element_selector = document.getElementById("Organs");
     element_selector.addEventListener('change', updateValue);
 
@@ -612,8 +607,7 @@ document.addEventListener("click", closeAllSelect);
             removeDivByID(".wikipediainfo")
         } else {
             emphasizeOrgan(e.target.value);
-            //loadWikipediaPreview(e.target.value) //TODO add this line
-            //loadWikipediaPreview("Posterior_vein_of_the_left_ventricle") // test line
+            loadWikipediaPreview(e.target.value)
         }
     }
 
@@ -703,8 +697,6 @@ document.addEventListener("click", closeAllSelect);
     // kick render loop
     render();
     app.executeLoading();
-
-
 </script>
 
 </body>
