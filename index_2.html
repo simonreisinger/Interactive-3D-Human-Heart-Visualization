@@ -14,7 +14,7 @@
 
 <body>
 <!--surround the select box with a "custom-select" DIV element. Remember to set the width:-->
-<div class="vertical-menu" style="width:300px; float:right; z-index: 100;">
+<div class="vertical-menu" style="width:1000px; float:right; z-index: 100;">
     <select id="Organs">
         <option value="Select organ:">Select organ:</option>
         <option value="Show all">Show all</option>
@@ -24,13 +24,15 @@
 <div id="glFullscreen">
     <canvas id="example"></canvas>
 </div>
+<!--
+
 <div id="dat" class="dg ac"></div>
 <div id="info">
     <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 usage options<br>Use module
     workers with Chromium based browser (80+)
     <div id="feedback"></div>
 </div>
-
+-->
 
 <script> // MENU
 
@@ -128,6 +130,8 @@ document.addEventListener("click", closeAllSelect);
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 			}
 
+
+
 </script>
 
 <script type="x-shader/x-fragment" id="fragmentshader">
@@ -149,29 +153,17 @@ document.addEventListener("click", closeAllSelect);
 
 			}
 
+
+
 </script>
 <script type="module">
-
 
     'use strict';
 
     import * as THREE from './libraries/threejs/build/three.module.js';
-    import {GUI} from './libraries/threejs/examples/jsm/libs/dat.gui.module.js';
-
     import {MeshPhongMaterial} from "./libraries/threejs/src/materials/MeshPhongMaterial.js";
-    import {MeshPhysicalMaterial} from "./libraries/threejs/src/materials/MeshPhysicalMaterial.js";
-
     import {TrackballControls} from "./libraries/threejs/examples/jsm/controls/TrackballControls.js";
-    import {VertexNormalsHelper} from "./libraries/threejs/examples/jsm/helpers/VertexNormalsHelper.js";
-
-    import {MTLLoader} from "./libraries/threejs/examples/jsm/loaders/MTLLoader.js";
-    import {MtlObjBridge} from "./libraries/threejs/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js";
-    import {OBJLoader2} from "./libraries/threejs/examples/jsm/loaders/OBJLoader2.js";
     import {OBJLoader2Parallel} from "./libraries/threejs/examples/jsm/loaders/OBJLoader2Parallel.js";
-    import {LoadedMeshUserOverride} from "./libraries/threejs/examples/jsm/loaders/obj2/shared/MeshReceiver.js";
-
-
-    import {OrbitControls} from './libraries/threejs/examples/jsm/controls/OrbitControls.js';
     import {EffectComposer} from './libraries/threejs/examples/jsm/postprocessing/EffectComposer.js';
     import {RenderPass} from './libraries/threejs/examples/jsm/postprocessing/RenderPass.js';
     import {ShaderPass} from './libraries/threejs/examples/jsm/postprocessing/ShaderPass.js';
@@ -247,7 +239,7 @@ document.addEventListener("click", closeAllSelect);
             this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
 
             this.scene = new THREE.Scene();
-            this.scene.traverse( this.disposeMaterial );
+            this.scene.traverse(this.disposeMaterial);
 
             this.camera = new THREE.PerspectiveCamera(this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far);
             this.resetCamera();
@@ -263,11 +255,6 @@ document.addEventListener("click", closeAllSelect);
             this.scene.add(directionalLight1);
             this.scene.add(directionalLight2);
             this.scene.add(ambientLight);
-
-            //let helper = new THREE.GridHelper(1200, 60, 0xFF4444, 0x404040);
-            //this.scene.add(helper);
-
-            //this.scene.add(cube);
 
             this.pivot = new THREE.Object3D();
             this.pivot.name = 'Pivot';
@@ -309,7 +296,6 @@ document.addEventListener("click", closeAllSelect);
             let modelName = modelInfos.Filename;
             let color = modelInfos.Class;
             const testFolder = './data/Postnatal_anatomical_structure/';
-            //const testFolder = './data/test/';
             this._reportProgress({detail: {text: 'Loading: ' + organName}});
 
             let local = new THREE.Object3D();
@@ -357,7 +343,7 @@ document.addEventListener("click", closeAllSelect);
                 output = event.detail.text;
             }
             console.log('Progress: ' + output);
-            document.getElementById('feedback').innerHTML = output;
+            //document.getElementById('feedback').innerHTML = output;
         },
 
         resizeDisplayGL: function () {
@@ -417,25 +403,21 @@ document.addEventListener("click", closeAllSelect);
 
             }
             // https://www.nhpr.org/post/violence-escalates-protests-over-george-floyd-death-continue#stream/0
-
         },
 
-         disposeMaterial: function( obj ) {
+        disposeMaterial: function (obj) {
 
-        if ( obj.material ) {
+            if (obj.material) {
 
-            obj.material.dispose();
+                obj.material.dispose();
 
-        }
+            }
 
-    },
+        },
 
         render: function () {
             if (!this.renderer.autoClear) this.renderer.clear();
             this.controls.update();
-
-            //cube.rotation.x += 0.05;
-            //cube.rotation.y += 0.05;
 
             switch (this.params.scene) {
 
@@ -503,15 +485,8 @@ document.addEventListener("click", closeAllSelect);
         },
 
         executeLoading: function () {
-            //Postnatal_anatomical_structure = [{Filename: "MM420_BP51969_FMA74912_Trunk of anterior interventricular branch of left coronary artery.obj", Class : "red"}]; // TODO remove this line
-            //var ii = 0;
-
-            //Postnatal_anatomical_structure = [{ Filename: "MM633_BP51882_FMA9542_Posterior wall of left atrium.obj", Class: "brown" }];
             let menu = document.getElementById("Organs");
             for (let currentObject in Postnatal_anatomical_structure) {
-                //console.log("Load Object: " + ii + " " + organName[organName.length - 1]);
-                //ii += 1;
-
                 let organName = Postnatal_anatomical_structure[currentObject].Filename.replace('.obj', '').split("_");
                 this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[0], organName[organName.length - 1]);
                 menu.add(new Option(organName[organName.length - 1], organName[organName.length - 1]), undefined);
@@ -549,6 +524,7 @@ document.addEventListener("click", closeAllSelect);
     }
 
     var oldName = ""
+
     function emphasizeOrgan(currentName) {
         //TODO add glow
         changeAllMaterial(1.0);
@@ -618,7 +594,7 @@ document.addEventListener("click", closeAllSelect);
             removeDivByID(".wikipediainfo")
         } else {
             emphasizeOrgan(e.target.value);
-            //loadWikipediaPreview(e.target.value) //TODO einblenden
+            loadWikipediaPreview(e.target.value) //TODO einblenden
         }
     }
 
@@ -630,63 +606,6 @@ document.addEventListener("click", closeAllSelect);
     let app = new WWOBJLoader2Example(document.getElementById('example'));
 
     let handleExecuteLoading;
-    let wwObjLoader2Control = {
-        flatShading: app.flatShading,
-        doubleSide: app.doubleSide,
-        useJsmWorker: app.useJsmWorker,
-        blockEvent: function (event) {
-
-            event.stopPropagation();
-
-        },
-        disableElement: function (elementHandle) {
-
-            elementHandle.domElement.addEventListener('click', this.blockEvent, true);
-            elementHandle.domElement.parentElement.style.pointerEvents = 'none';
-            elementHandle.domElement.parentElement.style.opacity = 0.5;
-
-        },
-        executeLoading: function () {
-
-            app.executeLoading();
-            this.disableElement(handleExecuteLoading);
-
-        },
-    };
-
-    let menuDiv = document.getElementById('dat');
-    let gui = new GUI({
-        autoPlace: false,
-        width: 320
-    });
-    menuDiv.appendChild(gui.domElement);
-
-    let folderRenderingOptions = gui.addFolder('Rendering Options');
-    let controlFlat = folderRenderingOptions.add(wwObjLoader2Control, 'flatShading').name('Flat Shading');
-    controlFlat.onChange(function (value) {
-        console.log('Setting flatShading to: ' + value);
-        app.alterShading();
-    });
-
-    let controlDouble = folderRenderingOptions.add(wwObjLoader2Control, 'doubleSide').name('Double Side Materials');
-    controlDouble.onChange(function (value) {
-        console.log('Setting doubleSide to: ' + value);
-        app.alterDouble();
-    });
-
-    let folderObjLoader2ParallelOptions = gui.addFolder('OBJLoader2Parallel Options');
-    let controlJsmWorker = folderObjLoader2ParallelOptions.add(wwObjLoader2Control, 'useJsmWorker').name('Use Module Workers');
-    controlJsmWorker.onChange(function (value) {
-        console.log('Setting useJsmWorker to: ' + value);
-        app.useJsmWorker = value;
-    });
-
-    let folderExecution = gui.addFolder('Execution');
-    handleExecuteLoading = folderExecution.add(wwObjLoader2Control, 'executeLoading').name('Run');
-    handleExecuteLoading.domElement.id = 'startButton';
-    folderRenderingOptions.open();
-    folderObjLoader2ParallelOptions.open();
-    folderExecution.open();
 
     // init three.js example application
     function resizeWindow() {
