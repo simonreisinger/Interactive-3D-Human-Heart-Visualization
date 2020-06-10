@@ -187,11 +187,11 @@ document.addEventListener("click", closeAllSelect);
     let mouse = new THREE.Vector2();
     console.log(window)
 
-    let cubeMaterial = new THREE.MeshNormalMaterial();
-    let cubeGeometry = new THREE.BoxBufferGeometry(10, 10, 10);
-    let cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    cube.position.set(0, 0, 0);
-    cube.layers.toggle(BLOOM_SCENE);
+    //let cubeMaterial = new THREE.MeshNormalMaterial();
+    //let cubeGeometry = new THREE.BoxBufferGeometry(10, 10, 10);
+    //let cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
+    //cube.position.set(0, 0, 0);
+    //cube.layers.toggle(BLOOM_SCENE);
 
 
     const WWOBJLoader2Example = function (elementToBindTo) {
@@ -225,7 +225,7 @@ document.addEventListener("click", closeAllSelect);
         this.controls = null;
 
         this.flatShading = false;
-        this.doubleSide = false;
+        this.doubleSide = true;
         this.useJsmWorker = false;
         this.loadCount = 6;
 
@@ -247,6 +247,7 @@ document.addEventListener("click", closeAllSelect);
             this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
 
             this.scene = new THREE.Scene();
+            this.scene.traverse( this.disposeMaterial );
 
             this.camera = new THREE.PerspectiveCamera(this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far);
             this.resetCamera();
@@ -266,7 +267,7 @@ document.addEventListener("click", closeAllSelect);
             //let helper = new THREE.GridHelper(1200, 60, 0xFF4444, 0x404040);
             //this.scene.add(helper);
 
-            this.scene.add(cube);
+            //this.scene.add(cube);
 
             this.pivot = new THREE.Object3D();
             this.pivot.name = 'Pivot';
@@ -419,12 +420,22 @@ document.addEventListener("click", closeAllSelect);
 
         },
 
+         disposeMaterial: function( obj ) {
+
+        if ( obj.material ) {
+
+            obj.material.dispose();
+
+        }
+
+    },
+
         render: function () {
             if (!this.renderer.autoClear) this.renderer.clear();
             this.controls.update();
 
-            cube.rotation.x += 0.05;
-            cube.rotation.y += 0.05;
+            //cube.rotation.x += 0.05;
+            //cube.rotation.y += 0.05;
 
             switch (this.params.scene) {
 
@@ -509,17 +520,15 @@ document.addEventListener("click", closeAllSelect);
         },
 
         onDocumentMouseClick_object: function (event) {
-
             event.preventDefault();
 
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1 + 0.25;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1 + 0.31; //
 
             this.raycaster.setFromCamera(mouse, this.camera);
             let intersects = this.raycaster.intersectObjects(this.pivot.children, true);
 
             if (intersects.length > 0) {
-                console.log(intersects)
                 for (i in intersects) {
                     let object = intersects[i].object;
                     if (object.visible) {
@@ -539,18 +548,19 @@ document.addEventListener("click", closeAllSelect);
         app.onDocumentMouseClick_object(currentName);
     }
 
-
+    var oldName = ""
     function emphasizeOrgan(currentName) {
         //TODO add glow
-        //changeAllMaterial(0.3);
+        changeAllMaterial(1.0);
         for (let ID in nameAndID) {
             if (nameAndID[ID] === currentName) {
                 //changeMaterial(i, 1.0);
                 partsModels[ID].children[0].children[0].layers.toggle(BLOOM_SCENE);
-            } else {
-                //partsModels[ID].children[0].children[0].layers.toggle(ENTIRE_SCENE);
+            } else if (nameAndID[ID] === oldName) {
+                partsModels[ID].children[0].children[0].layers.toggle(BLOOM_SCENE);
             }
         }
+        oldName = currentName;
     }
 
     function changeAllMaterial(opacity) {
@@ -563,7 +573,8 @@ document.addEventListener("click", closeAllSelect);
     }
 
     function changeMaterial(ID, opacity) {
-        partsModels[ID].layers.toggle(BLOOM_SCENE);
+        //partsModels[ID].layers.toggle(BLOOM_SCENE);
+        partsModels[ID].layers.toggle(ENTIRE_SCENE);
         let materialColor = partsModels[ID].children[0].children[0].material.color; // "rgb(0,255,0)";
         let currentOpacity = partsModels[ID].children[0].children[0].material.opacity;
 
@@ -580,7 +591,7 @@ document.addEventListener("click", closeAllSelect);
     }
 
     function changeMaterialOfObject(object, opacity) {
-        let materialColor = object.material.color; // "rgb(0,255,0)";
+        let materialColor = object.material.color;
         let currentOpacity = object.material.opacity;
 
         let material = new MeshPhongMaterial({
@@ -607,11 +618,12 @@ document.addEventListener("click", closeAllSelect);
             removeDivByID(".wikipediainfo")
         } else {
             emphasizeOrgan(e.target.value);
-            loadWikipediaPreview(e.target.value)
+            //loadWikipediaPreview(e.target.value) //TODO einblenden
         }
     }
 
     function resetMaterial() {
+        emphasizeOrgan("")
         changeAllMaterial(1.0)
     }
 
