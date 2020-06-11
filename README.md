@@ -17,3 +17,4 @@ Visualization [here](https://ippon1.github.io/Medical_Vis/)
 * Make UI more beautiful
 * Add german wikipedia articles
 * Add MIT Lizenz
+* Make App mobile compatible
