@@ -8,12 +8,13 @@
     <link type="text/css" rel="stylesheet" href="main.css">
     <script src="./data/Postnatal_anatomical_structure/Postnatal_anatomical_structure.js"></script>
     <script src="./menuStyle.js"></script>
-
+    <script src="findwikipediaInfos.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 </head>
 
 <body>
 <!--surround the select box with a "custom-select" DIV element. Remember to set the width:-->
-<div class="vertical-menu" style="width:300px;float:right; z-index: 100;">
+<div class="vertical-menu" style="width:500px; float:right; z-index: 100; position: absolute; right: 0;">
     <select id="Organs">
         <option value="Select organ:">Select organ:</option>
         <option value="Show all">Show all</option>
@@ -23,17 +24,17 @@
 <div id="glFullscreen">
     <canvas id="example"></canvas>
 </div>
+<!--
+
 <div id="dat" class="dg ac"></div>
 <div id="info">
     <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 usage options<br>Use module
     workers with Chromium based browser (80+)
     <div id="feedback"></div>
 </div>
-
+-->
 
 <script> // MENU
-console.log("MENU SCRIPT");
-
 
 var x, i, j, l, ll, selElmnt, a, b, c;
 /*look for any elements with the class "custom-select":*/
@@ -99,7 +100,7 @@ function closeAllSelect(elmnt) {
     xl = x.length;
     yl = y.length;
     for (i = 0; i < yl; i++) {
-        if (elmnt == y[i]) {
+        if (elmnt === y[i]) {
             arrNo.push(i)
         } else {
             y[i].classList.remove("select-arrow-active");
@@ -118,29 +119,75 @@ document.addEventListener("click", closeAllSelect);
 
 
 </script>
+<script type="x-shader/x-vertex" id="vertexshader">
 
+			varying vec2 vUv;
+
+			void main() {
+
+				vUv = uv;
+
+				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+			}
+
+</script>
+
+<script type="x-shader/x-fragment" id="fragmentshader">
+
+			uniform sampler2D baseTexture;
+			uniform sampler2D bloomTexture;
+
+			varying vec2 vUv;
+
+			vec4 getTexture( sampler2D texelToLinearTexture ) {
+
+				return mapTexelToLinear( texture2D( texelToLinearTexture , vUv ) );
+
+			}
+
+			void main() {
+
+				gl_FragColor = ( getTexture( baseTexture ) + vec4( 1.0 ) * getTexture( bloomTexture ) );
+
+			}
+
+</script>
 <script type="module">
-
 
     'use strict';
 
     import * as THREE from './libraries/threejs/build/three.module.js';
-    import {GUI} from './libraries/threejs/examples/jsm/libs/dat.gui.module.js';
-
     import {MeshPhongMaterial} from "./libraries/threejs/src/materials/MeshPhongMaterial.js";
-    import {MeshPhysicalMaterial} from "./libraries/threejs/src/materials/MeshPhysicalMaterial.js";
-
     import {TrackballControls} from "./libraries/threejs/examples/jsm/controls/TrackballControls.js";
-    import {VertexNormalsHelper} from "./libraries/threejs/examples/jsm/helpers/VertexNormalsHelper.js";
-
-    import {MTLLoader} from "./libraries/threejs/examples/jsm/loaders/MTLLoader.js";
-    import {MtlObjBridge} from "./libraries/threejs/examples/jsm/loaders/obj2/bridge/MtlObjBridge.js";
-    import {OBJLoader2} from "./libraries/threejs/examples/jsm/loaders/OBJLoader2.js";
     import {OBJLoader2Parallel} from "./libraries/threejs/examples/jsm/loaders/OBJLoader2Parallel.js";
-    import {LoadedMeshUserOverride} from "./libraries/threejs/examples/jsm/loaders/obj2/shared/MeshReceiver.js";
+    import {EffectComposer} from './libraries/threejs/examples/jsm/postprocessing/EffectComposer.js';
+    import {RenderPass} from './libraries/threejs/examples/jsm/postprocessing/RenderPass.js';
+    import {ShaderPass} from './libraries/threejs/examples/jsm/postprocessing/ShaderPass.js';
+    import {UnrealBloomPass} from './libraries/threejs/examples/jsm/postprocessing/UnrealBloomPass.js';
+
+    let ENTIRE_SCENE = 0;
+    let BLOOM_SCENE = 1;
+
+    let bloomLayer = new THREE.Layers();
+    bloomLayer.set(BLOOM_SCENE);
+    let materials = {};
+    let darkMaterial = new THREE.MeshBasicMaterial({color: "black"});
+    let mouse = new THREE.Vector2();
+    console.log(window)
 
     const WWOBJLoader2Example = function (elementToBindTo) {
+
+        this.params = {
+            exposure: 1,
+            bloomStrength: 1.3,
+            bloomThreshold: 0,
+            bloomRadius: 0,
+            scene: "Scene with Glow"
+        };
+        this.raycaster = new THREE.Raycaster();
+        this.finalComposer = null;
         this.renderer = null;
+        this.bloomComposer = null;
         this.canvas = elementToBindTo;
         this.aspectRatio = 1;
         this.recalcAspectRatio();
@@ -159,11 +206,10 @@ document.addEventListener("click", closeAllSelect);
         this.controls = null;
 
         this.flatShading = false;
-        this.doubleSide = false;
+        this.doubleSide = true;
         this.useJsmWorker = false;
         this.loadCount = 6;
 
-        this.cube = null;
         this.pivot = null;
     };
 
@@ -177,9 +223,12 @@ document.addEventListener("click", closeAllSelect);
                 antialias: true,
                 autoClear: true
             });
+            this.renderer.setPixelRatio(window.devicePixelRatio);
             this.renderer.setClearColor(0x050505);
+            this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
 
             this.scene = new THREE.Scene();
+            this.scene.traverse(this.disposeMaterial);
 
             this.camera = new THREE.PerspectiveCamera(this.cameraDefaults.fov, this.aspectRatio, this.cameraDefaults.near, this.cameraDefaults.far);
             this.resetCamera();
@@ -196,25 +245,46 @@ document.addEventListener("click", closeAllSelect);
             this.scene.add(directionalLight2);
             this.scene.add(ambientLight);
 
-            let helper = new THREE.GridHelper(1200, 60, 0xFF4444, 0x404040);
-            this.scene.add(helper);
-
-            let geometry = new THREE.BoxBufferGeometry(10, 10, 10);
-            let material = new THREE.MeshNormalMaterial();
-            this.cube = new THREE.Mesh(geometry, material);
-            this.cube.position.set(0, 0, 0);
-            this.scene.add(this.cube);
-
             this.pivot = new THREE.Object3D();
             this.pivot.name = 'Pivot';
             this.scene.add(this.pivot);
+
+            let renderScene = new RenderPass(this.scene, this.camera);
+
+            let bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+            bloomPass.threshold = this.params.bloomThreshold;
+            bloomPass.strength = this.params.bloomStrength;
+            bloomPass.radius = this.params.bloomRadius;
+
+            this.bloomComposer = new EffectComposer(this.renderer);
+            this.bloomComposer.renderToScreen = false;
+            this.bloomComposer.addPass(renderScene);
+            this.bloomComposer.addPass(bloomPass);
+
+            let finalPass = new ShaderPass(
+                new THREE.ShaderMaterial({
+                    uniforms: {
+                        baseTexture: {value: null},
+                        bloomTexture: {value: this.bloomComposer.renderTarget2.texture}
+                    },
+                    vertexShader: document.getElementById('vertexshader').textContent,
+                    fragmentShader: document.getElementById('fragmentshader').textContent,
+                    defines: {}
+                }), "baseTexture"
+            );
+            finalPass.needsSwap = true;
+
+            this.finalComposer = new EffectComposer(this.renderer);
+            this.finalComposer.addPass(renderScene);
+            this.finalComposer.addPass(finalPass);
+
+
         },
 
         useLoadParallel: function (modelInfos, ID, organName) {
             let modelName = modelInfos.Filename;
             let color = modelInfos.Class;
             const testFolder = './data/Postnatal_anatomical_structure/';
-            //const testFolder = './data/test/';
             this._reportProgress({detail: {text: 'Loading: ' + organName}});
 
             let local = new THREE.Object3D();
@@ -231,24 +301,21 @@ document.addEventListener("click", closeAllSelect);
 
             let material = new MeshPhongMaterial({color: modelInfos.Class, opacity: 1.0, transparent: true});
 
-
             function callbackOnLoad(object3d, message) {
                 object3d.traverse(function (child) {
                     if (child instanceof THREE.Mesh) {
                         child.material = material;
                     }
+                    object3d.userData = {name: modelName};
                 });
                 local.add(object3d);
 
-                //local.add(material);
                 scope._reportProgress({detail: {text: 'Loading of ' + modelName + ' completed: ' + message}});
                 scope.finalize();
             }
 
             objLoader2Parallel.load(testFolder + modelName, callbackOnLoad);
-            //console.log(modelName);
             partsModels[ID] = local;
-            console.log(partsModels)
         },
 
 
@@ -265,18 +332,27 @@ document.addEventListener("click", closeAllSelect);
                 output = event.detail.text;
             }
             console.log('Progress: ' + output);
-            document.getElementById('feedback').innerHTML = output;
+            //document.getElementById('feedback').innerHTML = output;
         },
 
         resizeDisplayGL: function () {
+            console.log("resizeDisplayGL")
             this.controls.handleResize();
             this.recalcAspectRatio();
-            this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight, false);
             this.updateCamera();
+            this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight, false);
+            this.bloomComposer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
+            this.finalComposer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
         },
 
         recalcAspectRatio: function () {
-            this.aspectRatio = (this.canvas.offsetHeight === 0) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+            console.log(this.canvas);
+            //this.aspectRatio = window.innerWidth / window.innerHeight;
+            //camera.updateProjectionMatrix();
+
+            //renderer.setSize( window.innerWidth, window.innerHeight );
+
+            this.aspectRatio = this.canvas.clientWidth / this.canvas.clientHeight;
         },
 
         resetCamera: function () {
@@ -291,12 +367,70 @@ document.addEventListener("click", closeAllSelect);
             this.camera.updateProjectionMatrix();
         },
 
+        renderBloom: function (mask) {
+
+            if (mask === true) {
+                this.scene.traverse(this.darkenNonBloomed);
+                this.bloomComposer.render();
+                this.scene.traverse(this.restoreMaterial);
+
+            } else {
+
+                this.camera.layers.set(BLOOM_SCENE);
+                this.bloomComposer.render();
+                this.camera.layers.set(ENTIRE_SCENE);
+            }
+        },
+
+        darkenNonBloomed: function (obj) {
+            if (obj.isMesh && bloomLayer.test(obj.layers) === false) {
+
+                materials[obj.uuid] = obj.material;
+                obj.material = darkMaterial;
+            }
+        },
+
+        restoreMaterial: function (obj) {
+            if (materials[obj.uuid]) {
+
+                obj.material = materials[obj.uuid];
+                delete materials[obj.uuid];
+
+            }
+            // https://www.nhpr.org/post/violence-escalates-protests-over-george-floyd-death-continue#stream/0
+        },
+
+        disposeMaterial: function (obj) {
+
+            if (obj.material) {
+
+                obj.material.dispose();
+
+            }
+
+        },
+
         render: function () {
             if (!this.renderer.autoClear) this.renderer.clear();
             this.controls.update();
-            this.cube.rotation.x += 0.05;
-            this.cube.rotation.y += 0.05;
-            this.renderer.render(this.scene, this.camera);
+
+            switch (this.params.scene) {
+
+                case 'Scene only':
+                    this.renderer.render(this.scene, this.camera);
+                    break;
+                case 'Glow only':
+                    this.renderBloom(false);
+                    break;
+                case 'Scene with Glow':
+                default:
+                    // render scene with bloom
+                    this.renderBloom(true);
+
+                    // render the entire scene, then render bloom scene on top
+                    this.finalComposer.render();
+                    break;
+            }
         },
 
         alterShading: function () {
@@ -335,10 +469,10 @@ document.addEventListener("click", closeAllSelect);
 
         traverseScene: function (object3d) {
             if (Array.isArray(object3d.material)) {
-                let materials = object3d.material.materials;
-                for (let name in materials) {
+                let currentMaterials = object3d.material.materials;
+                for (let name in currentMaterials) {
 
-                    if (materials.hasOwnProperty(name)) this.traversalFunction(materials[name]);
+                    if (currentMaterials.hasOwnProperty(name)) this.traversalFunction(currentMaterials[name]);
                 }
             } else if (object3d.material) {
                 this.traversalFunction(object3d.material);
@@ -346,58 +480,84 @@ document.addEventListener("click", closeAllSelect);
         },
 
         executeLoading: function () {
-            // Postnatal_anatomical_structure = [{Filename: "MM420_BP51969_FMA74912_Trunk of anterior interventricular branch of left coronary artery.obj", Class : "red"}]; // TODO remove this line
-            //var ii = 0;
-
-
-            //Postnatal_anatomical_structure = [{Filename: "MM633_BP51882_FMA9542_Posterior wall of left atrium.obj", Class : "brown"}];
             let menu = document.getElementById("Organs");
             for (let currentObject in Postnatal_anatomical_structure) {
-                //console.log("Load Object: " + ii + " " + organName[organName.length - 1]);
-                //ii += 1;
-
                 let organName = Postnatal_anatomical_structure[currentObject].Filename.replace('.obj', '').split("_");
                 this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[0], organName[organName.length - 1]);
-                menu.add(new Option(organName[organName.length - 1], organName[organName.length - 1]), undefined);
-                nameAndID[organName[0]] = organName[organName.length - 1];
+                let currentName = organName[organName.length - 1];
+                if (!this.arrayContainsString(nameAndID, currentName)) {
+                    menu.add(new Option(currentName, currentName), undefined);
+                    nameAndID[organName[0]] = currentName;
+                }
             }
-            console.log(partsModels)
-            console.log(nameAndID)
+        },
+
+        arrayContainsString: function (myArray, value) {
+            for (let i in myArray) {
+                console.log()
+                if (myArray[i] === value) {
+                    return true;
+                }
+            }
+            return false;
+        },
+
+
+        onDocumentMouseClick_object: function (event) {
+            event.preventDefault();
+
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; // + 0.31
+
+            this.raycaster.setFromCamera(mouse, this.camera);
+            let intersects = this.raycaster.intersectObjects(this.pivot.children, true);
+
+            if (intersects.length > 0) {
+                for (i in intersects) {
+                    let object = intersects[i].object;
+                    if (object.visible) {
+                        object.visible = false;
+                        break;
+                    }
+                }
+                this.render();
+            }
         }
     };
 
     let partsModels = [];
     let nameAndID = [];
 
-    function isString(obj) {
-        return !isNaN(obj)
+    function onDocumentMouseClick(currentName) {
+        app.onDocumentMouseClick_object(currentName);
     }
+
+    var oldName = ""
 
     function emphasizeOrgan(currentName) {
         //TODO add glow
-        changeAllMaterial(0.3);
-        for (let i in nameAndID){
-            if (nameAndID[i] === currentName){
-                changeMaterial(i, 1.0);
+        changeAllMaterial(1.0);
+        for (let ID in nameAndID) {
+            if (nameAndID[ID] === currentName) {
+                partsModels[ID].children[0].children[0].layers.toggle(BLOOM_SCENE);
+            } else if (nameAndID[ID] === oldName) {
+                partsModels[ID].children[0].children[0].layers.toggle(BLOOM_SCENE);
             }
-
         }
+        oldName = currentName;
     }
 
     function changeAllMaterial(opacity) {
-        console.log(partsModels)
-        console.log(partsModels.length)
-        var i = 0;
+        let i = 0;
         for (let currentID in nameAndID) {
-            console.log(i + " " + currentID);
             i = i + 1;
+            partsModels[currentID].children[0].children[0].visible = true;
             changeMaterial(currentID, opacity)
         }
     }
 
     function changeMaterial(ID, opacity) {
-        console.log(ID)
-        console.log(partsModels)
+        partsModels[ID].layers.toggle(ENTIRE_SCENE);
         let materialColor = partsModels[ID].children[0].children[0].material.color; // "rgb(0,255,0)";
         let currentOpacity = partsModels[ID].children[0].children[0].material.opacity;
 
@@ -408,91 +568,50 @@ document.addEventListener("click", closeAllSelect);
             transparent: true,
             depthTest: true
         });
-        //material.depthWrite = false;
         partsModels[ID].children[0].children[0].material = material;
         partsModels[ID].children[0].children[0].geometry.uvsNeedUpdate = true;
         partsModels[ID].needsUpdate = true;
     }
 
-    let element_selector = document.getElementById("Organs");
+    function changeMaterialOfObject(object, opacity) {
+        let materialColor = object.material.color;
+        let currentOpacity = object.material.opacity;
 
+        let material = new MeshPhongMaterial({
+            color: materialColor,
+            opacity: opacity,
+            transparent: true,
+            depthTest: true
+        });
+        object.material = material;
+        object.geometry.uvsNeedUpdate = true;
+        object.needsUpdate = true;
+    }
+
+    function removeDivByID(divid) {
+        $("div").remove(divid);
+    }
+
+    let element_selector = document.getElementById("Organs");
     element_selector.addEventListener('change', updateValue);
 
     function updateValue(e) {
         if (e.target.value === "Select organ:" || e.target.value === "Show all") {
             resetMaterial();
+            removeDivByID(".wikipediainfo")
         } else {
             emphasizeOrgan(e.target.value);
+            loadWikipediaPreview(e.target.value) //TODO einblenden
         }
     }
 
     function resetMaterial() {
+        emphasizeOrgan("")
         changeAllMaterial(1.0)
     }
 
-
     let app = new WWOBJLoader2Example(document.getElementById('example'));
 
-    let handleExecuteLoading;
-    let wwObjLoader2Control = {
-        flatShading: app.flatShading,
-        doubleSide: app.doubleSide,
-        useJsmWorker: app.useJsmWorker,
-        blockEvent: function (event) {
-
-            event.stopPropagation();
-
-        },
-        disableElement: function (elementHandle) {
-
-            elementHandle.domElement.addEventListener('click', this.blockEvent, true);
-            elementHandle.domElement.parentElement.style.pointerEvents = 'none';
-            elementHandle.domElement.parentElement.style.opacity = 0.5;
-
-        },
-        executeLoading: function () {
-
-            app.executeLoading();
-            this.disableElement(handleExecuteLoading);
-
-        },
-    };
-
-    let menuDiv = document.getElementById('dat');
-    let gui = new GUI({
-        autoPlace: false,
-        width: 320
-    });
-    menuDiv.appendChild(gui.domElement);
-
-    let folderRenderingOptions = gui.addFolder('Rendering Options');
-    let controlFlat = folderRenderingOptions.add(wwObjLoader2Control, 'flatShading').name('Flat Shading');
-    controlFlat.onChange(function (value) {
-        console.log('Setting flatShading to: ' + value);
-        app.alterShading();
-    });
-
-    let controlDouble = folderRenderingOptions.add(wwObjLoader2Control, 'doubleSide').name('Double Side Materials');
-    controlDouble.onChange(function (value) {
-        console.log('Setting doubleSide to: ' + value);
-        app.alterDouble();
-    });
-
-    let folderObjLoader2ParallelOptions = gui.addFolder('OBJLoader2Parallel Options');
-    let controlJsmWorker = folderObjLoader2ParallelOptions.add(wwObjLoader2Control, 'useJsmWorker').name('Use Module Workers');
-    controlJsmWorker.onChange(function (value) {
-        console.log('Setting useJsmWorker to: ' + value);
-        app.useJsmWorker = value;
-    });
-    let folderExecution = gui.addFolder('Execution');
-    handleExecuteLoading = folderExecution.add(wwObjLoader2Control, 'executeLoading').name('Run');
-    handleExecuteLoading.domElement.id = 'startButton';
-    folderRenderingOptions.open();
-    folderObjLoader2ParallelOptions.open();
-    folderExecution.open();
-
-
-    // init three.js example application
     function resizeWindow() {
         app.resizeDisplayGL();
     }
@@ -503,6 +622,7 @@ document.addEventListener("click", closeAllSelect);
     }
 
     window.addEventListener('resize', resizeWindow, false);
+    window.addEventListener('click', onDocumentMouseClick, false);
 
     console.log('Starting initialisation phase...');
     app.initGL();
@@ -511,7 +631,6 @@ document.addEventListener("click", closeAllSelect);
     // kick render loop
     render();
     app.executeLoading();
-    //*/
 </script>
 
 </body>
