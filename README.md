@@ -9,7 +9,7 @@ Visualization [here](https://ippon1.github.io/Medical_Vis/)
 
 # Sources:
 * [threejs](https://threejs.org/)
-* [Model](http://lifesciencedb.jp/bp3d/?fbclid=IwAR1KWPydXGal56TpQECD6nJsdcyhLHbElKpUotss5UFEw22KZFBliX3ugtY)
+* Model: BodyParts3D, © The Database Center for Life Science licensed under CC Attribution-Share Alike 2.1 Japan ([Link](http://lifesciencedb.jp/bp3d/?fbclid=IwAR1KWPydXGal56TpQECD6nJsdcyhLHbElKpUotss5UFEw22KZFBliX3ugtY))
 * [jquery](https://jquery.com/)
 * [Wikipedia](https://en.wikipedia.org)
 
