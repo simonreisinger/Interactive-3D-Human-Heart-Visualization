@@ -1,5 +1,9 @@
 # Medical_Vis
-Visualization [here](https://ippon1.github.io/Medical_Vis/) (Press RUN than you can see the heart)
+Visualization [here](https://ippon1.github.io/Medical_Vis/)
+
+## Functionality
+* On the right top corner you can select part of the organ. This will be emphasized and on the right side a fitting wikipedia Article will be added.
+* If one organ hides another one you can remove parts of the heart to get a better look.
 
 Medical_Vis 2
 
@@ -10,9 +14,8 @@ Medical_Vis 2
 * [threejs](https://threejs.org/)
 * [Model](http://lifesciencedb.jp/bp3d/?fbclid=IwAR1KWPydXGal56TpQECD6nJsdcyhLHbElKpUotss5UFEw22KZFBliX3ugtY)
 * [jquery](https://jquery.com/)
+* [Wikipedia](https://en.wikipedia.org)
 
 # TODOs
-* Transparency still has artifacts
-* add bloom to emphasize organ
 * Make UI more beautiful
-* add explanation for selected organ
+* Add german wikipedia articles
