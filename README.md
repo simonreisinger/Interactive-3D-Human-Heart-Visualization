@@ -1,4 +1,4 @@
-# Medical_Vis
+# Heart Visualization
 This program was built for the lecture Medical Visualization at TU Wien.
 
 Visualization [here](https://ippon1.github.io/Medical_Vis/)
