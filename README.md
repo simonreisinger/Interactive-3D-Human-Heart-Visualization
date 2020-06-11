@@ -10,16 +10,16 @@ Visualization [here](https://ippon1.github.io/Medical_Vis/)
 * If one organ hides another one you can remove parts of the heart to get a better look.
 
 ## Color Scheme
-Attempt | color
+Organ strucutres | color
 --- | --- 
-Coronary arteries | Red
-Pulmonary vein | Red
-Aorta | Red
-Coronary veins | Blue
-Pulmonary arteries | Blue
-Vena cava superior and inferior | Blue
+Coronary arteries | red
+Pulmonary vein | red
+Aorta | red
+Coronary veins | blue
+Pulmonary arteries | blue
+Vena cava superior and inferior | blue
 Trabecular muscle | saddlebrown
-Myocard | Brown
+Myocard | brown
 right and left Auricle | #ffc0a1
 Heart valve | lightblue
 
