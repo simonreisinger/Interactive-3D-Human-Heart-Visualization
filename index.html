@@ -332,7 +332,6 @@ document.addEventListener("click", closeAllSelect);
                 output = event.detail.text;
             }
             console.log('Progress: ' + output);
-            //document.getElementById('feedback').innerHTML = output;
         },
 
         resizeDisplayGL: function () {
@@ -346,12 +345,6 @@ document.addEventListener("click", closeAllSelect);
         },
 
         recalcAspectRatio: function () {
-            console.log(this.canvas);
-            //this.aspectRatio = window.innerWidth / window.innerHeight;
-            //camera.updateProjectionMatrix();
-
-            //renderer.setSize( window.innerWidth, window.innerHeight );
-
             this.aspectRatio = this.canvas.clientWidth / this.canvas.clientHeight;
         },
 
@@ -395,9 +388,7 @@ document.addEventListener("click", closeAllSelect);
 
                 obj.material = materials[obj.uuid];
                 delete materials[obj.uuid];
-
             }
-            // https://www.nhpr.org/post/violence-escalates-protests-over-george-floyd-death-continue#stream/0
         },
 
         disposeMaterial: function (obj) {
