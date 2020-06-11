@@ -14,7 +14,7 @@
 
 <body>
 <!--surround the select box with a "custom-select" DIV element. Remember to set the width:-->
-<div class="vertical-menu" style="width:1000px; float:right; z-index: 100;">
+<div class="vertical-menu" style="width:500px; float:right; z-index: 100; position: absolute; right: 0;">
     <select id="Organs">
         <option value="Select organ:">Select organ:</option>
         <option value="Show all">Show all</option>
@@ -130,8 +130,6 @@ document.addEventListener("click", closeAllSelect);
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 			}
 
-
-
 </script>
 
 <script type="x-shader/x-fragment" id="fragmentshader">
@@ -152,8 +150,6 @@ document.addEventListener("click", closeAllSelect);
 				gl_FragColor = ( getTexture( baseTexture ) + vec4( 1.0 ) * getTexture( bloomTexture ) );
 
 			}
-
-
 
 </script>
 <script type="module">
@@ -178,13 +174,6 @@ document.addEventListener("click", closeAllSelect);
     let darkMaterial = new THREE.MeshBasicMaterial({color: "black"});
     let mouse = new THREE.Vector2();
     console.log(window)
-
-    //let cubeMaterial = new THREE.MeshNormalMaterial();
-    //let cubeGeometry = new THREE.BoxBufferGeometry(10, 10, 10);
-    //let cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    //cube.position.set(0, 0, 0);
-    //cube.layers.toggle(BLOOM_SCENE);
-
 
     const WWOBJLoader2Example = function (elementToBindTo) {
 
@@ -236,7 +225,7 @@ document.addEventListener("click", closeAllSelect);
             });
             this.renderer.setPixelRatio(window.devicePixelRatio);
             this.renderer.setClearColor(0x050505);
-            this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
+            this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
 
             this.scene = new THREE.Scene();
             this.scene.traverse(this.disposeMaterial);
@@ -350,14 +339,20 @@ document.addEventListener("click", closeAllSelect);
             console.log("resizeDisplayGL")
             this.controls.handleResize();
             this.recalcAspectRatio();
-            this.renderer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight, false);
-            this.bloomComposer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
-            this.finalComposer.setSize(this.canvas.offsetWidth, this.canvas.offsetHeight);
             this.updateCamera();
+            this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight, false);
+            this.bloomComposer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
+            this.finalComposer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
         },
 
         recalcAspectRatio: function () {
-            this.aspectRatio = (this.canvas.offsetHeight === 0) ? 1 : this.canvas.offsetWidth / this.canvas.offsetHeight;
+            console.log(this.canvas);
+            //this.aspectRatio = window.innerWidth / window.innerHeight;
+            //camera.updateProjectionMatrix();
+
+            //renderer.setSize( window.innerWidth, window.innerHeight );
+
+            this.aspectRatio = this.canvas.clientWidth / this.canvas.clientHeight;
         },
 
         resetCamera: function () {
@@ -498,7 +493,7 @@ document.addEventListener("click", closeAllSelect);
             event.preventDefault();
 
             mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1 + 0.31; //
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; // + 0.31
 
             this.raycaster.setFromCamera(mouse, this.camera);
             let intersects = this.raycaster.intersectObjects(this.pivot.children, true);
@@ -530,7 +525,6 @@ document.addEventListener("click", closeAllSelect);
         changeAllMaterial(1.0);
         for (let ID in nameAndID) {
             if (nameAndID[ID] === currentName) {
-                //changeMaterial(i, 1.0);
                 partsModels[ID].children[0].children[0].layers.toggle(BLOOM_SCENE);
             } else if (nameAndID[ID] === oldName) {
                 partsModels[ID].children[0].children[0].layers.toggle(BLOOM_SCENE);
@@ -549,7 +543,6 @@ document.addEventListener("click", closeAllSelect);
     }
 
     function changeMaterial(ID, opacity) {
-        //partsModels[ID].layers.toggle(BLOOM_SCENE);
         partsModels[ID].layers.toggle(ENTIRE_SCENE);
         let materialColor = partsModels[ID].children[0].children[0].material.color; // "rgb(0,255,0)";
         let currentOpacity = partsModels[ID].children[0].children[0].material.opacity;
@@ -581,12 +574,12 @@ document.addEventListener("click", closeAllSelect);
         object.needsUpdate = true;
     }
 
-    let element_selector = document.getElementById("Organs");
-    element_selector.addEventListener('change', updateValue);
-
     function removeDivByID(divid) {
         $("div").remove(divid);
     }
+
+    let element_selector = document.getElementById("Organs");
+    element_selector.addEventListener('change', updateValue);
 
     function updateValue(e) {
         if (e.target.value === "Select organ:" || e.target.value === "Show all") {
@@ -605,13 +598,9 @@ document.addEventListener("click", closeAllSelect);
 
     let app = new WWOBJLoader2Example(document.getElementById('example'));
 
-    let handleExecuteLoading;
-
-    // init three.js example application
     function resizeWindow() {
         app.resizeDisplayGL();
     }
-
 
     function render() {
         requestAnimationFrame(render);

@@ -16,10 +16,9 @@ function loadWikipediaPreview(currentName) {
             async: false,
             dataType: "json",
             success: function (data, textStatus, jqXHR) {
-                console.log(data)
-                let markup = data.parse.text["*"];
+                var markup = data.parse.text["*"]; // raw text
+                markup = markup.replace(/margin-left: 380px;/g, 'margin-left: 0px;');
                 let blurb = $('<div class=\'wikipediainfo\'></div>').html(markup);
-                //$('#article').html($(blurb).find('wikipediainfo'));
                 $(blurb).appendTo('body');
             },
             error: function (errorMessage) {
