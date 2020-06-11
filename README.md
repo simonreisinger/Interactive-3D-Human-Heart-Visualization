@@ -35,3 +35,4 @@ Heart valve | lightblue
 * Add MIT Lizenz
 * Make App mobile compatible
 * Implement a backlog so COMAND + Z can be used
+* Rename Repo
