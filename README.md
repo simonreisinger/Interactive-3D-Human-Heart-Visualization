@@ -16,3 +16,4 @@ Visualization [here](https://ippon1.github.io/Medical_Vis/)
 # TODOs
 * Make UI more beautiful
 * Add german wikipedia articles
+* Add MIT Lizenz
