@@ -484,10 +484,24 @@ document.addEventListener("click", closeAllSelect);
             for (let currentObject in Postnatal_anatomical_structure) {
                 let organName = Postnatal_anatomical_structure[currentObject].Filename.replace('.obj', '').split("_");
                 this.useLoadParallel(Postnatal_anatomical_structure[currentObject], organName[0], organName[organName.length - 1]);
-                menu.add(new Option(organName[organName.length - 1], organName[organName.length - 1]), undefined);
-                nameAndID[organName[0]] = organName[organName.length - 1];
+                let currentName = organName[organName.length - 1];
+                if (!this.arrayContainsString(nameAndID, currentName)) {
+                    menu.add(new Option(currentName, currentName), undefined);
+                    nameAndID[organName[0]] = currentName;
+                }
             }
         },
+
+        arrayContainsString: function (myArray, value) {
+            for (let i in myArray) {
+                console.log()
+                if (myArray[i] === value) {
+                    return true;
+                }
+            }
+            return false;
+        },
+
 
         onDocumentMouseClick_object: function (event) {
             event.preventDefault();
