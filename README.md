@@ -9,6 +9,20 @@ Visualization [here](https://ippon1.github.io/Medical_Vis/)
 * On the right top corner you can select part of the organ. This will be emphasized and on the right side a fitting wikipedia Article will be added.
 * If one organ hides another one you can remove parts of the heart to get a better look.
 
+## Color Scheme
+Organ strucutres | color
+--- | --- 
+Coronary arteries | red
+Pulmonary vein | red
+Aorta | red
+Coronary veins | blue
+Pulmonary arteries | blue
+Vena cava superior and inferior | blue
+Trabecular muscle | saddlebrown
+Myocard | brown
+right and left Auricle | #ffc0a1
+Heart valve | lightblue
+
 # Sources:
 * [threejs](https://threejs.org/)
 * [jquery](https://jquery.com/)
