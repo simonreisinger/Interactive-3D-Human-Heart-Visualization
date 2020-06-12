@@ -246,8 +246,8 @@ document.addEventListener("click", closeAllSelect);
             this.controls = new TrackballControls(this.camera, this.renderer.domElement);
 
             let ambientLight = new THREE.AmbientLight(0x404040);
-            let directionalLight1 = new THREE.DirectionalLight(0xC0C090);
-            let directionalLight2 = new THREE.DirectionalLight(0xC0C090);
+            let directionalLight1 = new THREE.DirectionalLight(0xC0C0C0);
+            let directionalLight2 = new THREE.DirectionalLight(0xC0C0C0);
 
             directionalLight1.position.set(-100, -50, 100);
             directionalLight2.position.set(100, 50, -100);
@@ -346,6 +346,7 @@ document.addEventListener("click", closeAllSelect);
         },
 
         resizeDisplayGL: function () {
+            // TODO edit here
             console.log("resizeDisplayGL")
             this.controls.handleResize();
             this.recalcAspectRatio();
@@ -435,40 +436,6 @@ document.addEventListener("click", closeAllSelect);
             }
         },
 
-        alterShading: function () {
-            let scope = this;
-            scope.flatShading = !scope.flatShading;
-            console.log(scope.flatShading ? 'Enabling flat shading' : 'Enabling smooth shading');
-
-            scope.traversalFunction = function (material) {
-                material.flatShading = scope.flatShading;
-                material.needsUpdate = true;
-            };
-
-            function scopeTraverse(object3d) {
-                scope.traverseScene(object3d);
-            }
-
-            scope.pivot.traverse(scopeTraverse);
-        },
-
-        // TODO just double side
-        alterDouble: function () {
-            let scope = this;
-            scope.doubleSide = !scope.doubleSide;
-            console.log(scope.doubleSide ? 'Enabling THREE.DoubleSide materials' : 'Enabling THREE.FrontSide materials');
-
-            scope.traversalFunction = function (material) {
-                material.side = scope.doubleSide ? THREE.DoubleSide : THREE.FrontSide;
-            };
-
-            function scopeTraverse(object3d) {
-                scope.traverseScene(object3d);
-            }
-
-            scope.pivot.traverse(scopeTraverse);
-        },
-
         traverseScene: function (object3d) {
             if (Array.isArray(object3d.material)) {
                 let currentMaterials = object3d.material.materials;
@@ -508,8 +475,8 @@ document.addEventListener("click", closeAllSelect);
         onDocumentMouseClick_object: function (event) {
             event.preventDefault();
 
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; // + 0.31
+            mouse.x = (event.clientX / this.canvas.clientWidth) * 2 - 1;
+            mouse.y = -(event.clientY / this.canvas.clientHeight) * 2 + 1;
 
             this.raycaster.setFromCamera(mouse, this.camera);
             let intersects = this.raycaster.intersectObjects(this.pivot.children, true);
