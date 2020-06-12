@@ -12,7 +12,7 @@ Visualization [here](https://ippon1.github.io/Medical_Vis/)
 ## Controls
 * The Visualization can be rotated by dragging the mouse. For translation on Mac the CONTROL key has to be pressed.
 * If you click at one anatomical structure the visibility will be set to false.
-* To select and highlight an Object there is a menu at the top right corner. 
+* To select and highlight an object and get further informations there is a menu at the top right corner. 
 
 ## Color scheme for the different kinds of anatomical structures
 Organ strucutres | color
