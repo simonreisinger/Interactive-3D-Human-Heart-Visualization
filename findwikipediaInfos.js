@@ -1,11 +1,11 @@
 // Source: https://codepen.io/jasonchan/pen/JXwONj
 // Source: http://jsfiddle.net/fm0vxg32/
-function loadWikipediaPreview(currentName) {
+function loadWikipediaPreview(currentName, language) {
     if (currentName !== null && currentName !== undefined && currentName !== "") {
-        let currentWiki =  Postnatal_anatomical_structure.filter(obj => {
+        let currentWiki = Postnatal_anatomical_structure.filter(obj => {
             return obj.Filename.includes(currentName)
         })[0];
-        let url = "https://en.wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&page=" + currentWiki.wikipediaInfos + "&callback=?";
+        let url = "https://" + language + ".wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&page=" + currentWiki.wikipediaInfos + "&callback=?";
         $.ajax({
             type: "GET",
             url: url,
