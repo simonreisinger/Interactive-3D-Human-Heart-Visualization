@@ -22,12 +22,7 @@
         <option value="Show all">Show all</option>
     </select>
 
-    <select id="languageSelector">
-        <!-- TODO make gathering languages dynamicly -->
-        <option value="en">en</option>
-        <option value="de">de</option>
-    </select>
-
+    <select id="languageSelector"> </select>
 </div>
 
 <div id="glFullscreen">
@@ -601,6 +596,10 @@ document.addEventListener("click", closeAllSelect);
 
     let element_selector = document.getElementById("Organs");
     let language_selector = document.getElementById("languageSelector");
+
+    for (i in Postnatal_anatomical_structure[0].wikipediaInfos) {
+        language_selector.add(new Option(i, i), undefined);
+    }
 
     element_selector.addEventListener('change', updateValue);
     language_selector.addEventListener('change', updateValue);
