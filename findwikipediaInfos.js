@@ -5,7 +5,8 @@ function loadWikipediaPreview(currentName, language) {
         let currentWiki = Postnatal_anatomical_structure.filter(obj => {
             return obj.Filename.includes(currentName)
         })[0];
-        let url = "https://" + language + ".wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&page=" + currentWiki.wikipediaInfos + "&callback=?";
+        console.log(currentWiki.wikipediaInfos[language])
+        let url = "https://" + language + ".wikipedia.org/w/api.php?action=parse&format=json&prop=text&section=0&page=" + currentWiki.wikipediaInfos[language] + "&callback=?";
         $.ajax({
             type: "GET",
             url: url,

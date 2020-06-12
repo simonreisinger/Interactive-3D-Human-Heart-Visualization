@@ -10,15 +10,24 @@
     <script src="./menuStyle.js"></script>
     <script src="findwikipediaInfos.js"></script>
     <script src="./libraries/jquery-3.5.1.min.js"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/2.3.1/css/flag-icon.min.css" rel="stylesheet"/>
 </head>
 
 <body>
 <!--surround the select box with a "custom-select" DIV element. Remember to set the width:-->
-<div class="vertical-menu" style="width:500px; float:right; z-index: 100; position: absolute; right: 0;">
+<div class="vertical-menu" style="width:700px; float:right; z-index: 100; position: absolute; right: 0;">
     <select id="Organs">
         <option value="Select organ:">Select part of organ:</option>
         <option value="Show all">Show all</option>
     </select>
+
+    <select id="languageSelector">
+        <!-- TODO make gathering languages dynamicly -->
+        <option value="en">en</option>
+        <option value="de">de</option>
+    </select>
+
 </div>
 
 <div id="glFullscreen">
@@ -130,6 +139,7 @@ document.addEventListener("click", closeAllSelect);
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 			}
 
+
 </script>
 
 <script type="x-shader/x-fragment" id="fragmentshader">
@@ -151,6 +161,7 @@ document.addEventListener("click", closeAllSelect);
 
 			}
 
+
 </script>
 <script type="module">
 
@@ -165,6 +176,7 @@ document.addEventListener("click", closeAllSelect);
     import {ShaderPass} from './libraries/threejs/examples/jsm/postprocessing/ShaderPass.js';
     import {UnrealBloomPass} from './libraries/threejs/examples/jsm/postprocessing/UnrealBloomPass.js';
 
+
     let ENTIRE_SCENE = 0;
     let BLOOM_SCENE = 1;
 
@@ -173,7 +185,11 @@ document.addEventListener("click", closeAllSelect);
     let materials = {};
     let darkMaterial = new THREE.MeshBasicMaterial({color: "black"});
     let mouse = new THREE.Vector2();
-    console.log(window)
+
+    function getSelectedLanguage(newLanguage) {
+        let sel = document.getElementById("languageSelector");
+        return sel.options[sel.selectedIndex].text;
+    }
 
     const WWOBJLoader2Example = function (elementToBindTo) {
 
@@ -584,7 +600,10 @@ document.addEventListener("click", closeAllSelect);
     }
 
     let element_selector = document.getElementById("Organs");
+    let language_selector = document.getElementById("languageSelector");
+
     element_selector.addEventListener('change', updateValue);
+    language_selector.addEventListener('change', updateValue);
 
     function updateValue(e) {
         if (e.target.value === "Select organ:" || e.target.value === "Show all") {
@@ -592,7 +611,9 @@ document.addEventListener("click", closeAllSelect);
             removeDivByID(".wikipediainfo")
         } else {
             emphasizeOrgan(e.target.value);
-            loadWikipediaPreview(e.target.value, "en")
+            let currentLanguage = getSelectedLanguage()
+            console.log(currentLanguage);
+            loadWikipediaPreview(e.target.value, currentLanguage); // currentLanguage
         }
     }
 
