@@ -9,7 +9,12 @@ Visualization [here](https://ippon1.github.io/Medical_Vis/)
 * On the right top corner you can select part of the organ. This will be emphasized and on the right side a fitting wikipedia Article will be added.
 * If one organ hides another one you can remove parts of the heart to get a better look.
 
-## Color scheme for the different kinds of anatomicalstructures
+## Controls
+* The Visualization can be rotated by dragging the mouse. For translation on Mac the CONTROL key has to be pressed.
+* If you click at one anatomical structure the visibility will be set to false.
+* To select and highlight an Object there is a menu at the top right corner. 
+
+## Color scheme for the different kinds of anatomical structures
 Organ strucutres | color
 --- | --- 
 Coronary arteries | red
