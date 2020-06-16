@@ -454,14 +454,13 @@ document.addEventListener("click", closeAllSelect);
                 let currentName = organName[organName.length - 1];
                 if (!this.arrayContainsString(nameAndID, currentName)) {
                     menu.add(new Option(currentName, currentName), undefined);
-                    nameAndID[organName[0]] = currentName;
                 }
+                nameAndID[organName[0]] = currentName;
             }
         },
 
         arrayContainsString: function (myArray, value) {
             for (let i in myArray) {
-                console.log()
                 if (myArray[i] === value) {
                     return true;
                 }
@@ -494,7 +493,6 @@ document.addEventListener("click", closeAllSelect);
 
     let partsModels = [];
     let nameAndID = [];
-
     function onDocumentMouseClick(currentName) {
         app.onDocumentMouseClick_object(currentName);
     }
@@ -502,7 +500,6 @@ document.addEventListener("click", closeAllSelect);
     var oldName = ""
 
     function emphasizeOrgan(currentName) {
-        //TODO add glow
         changeAllMaterial(1.0);
         for (let ID in nameAndID) {
             if (nameAndID[ID] === currentName) {
@@ -577,7 +574,7 @@ document.addEventListener("click", closeAllSelect);
         }
     }
 
-    function updateWikipedia(e){
+    function updateWikipedia(e) {
         let currentLanguage = getSelectedLanguage()
         if (currentLanguage !== "none") {
             loadWikipediaPreview(e.target.value, currentLanguage); // currentLanguage
