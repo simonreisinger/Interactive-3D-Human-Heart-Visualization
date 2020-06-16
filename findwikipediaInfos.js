@@ -2,7 +2,7 @@
 // Source: http://jsfiddle.net/fm0vxg32/
 function loadWikipediaPreview(currentName, language) {
     if (currentName !== null && currentName !== undefined && currentName !== "") {
-        let currentWiki = Postnatal_anatomical_structure.filter(obj => {
+        let currentWiki = Postnatal_anatomical_structure.filter(function(obj) {
             return obj.Filename.includes(currentName)
         })[0];
         console.log(currentWiki.wikipediaInfos[language])
