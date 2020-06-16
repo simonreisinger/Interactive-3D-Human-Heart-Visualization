@@ -133,8 +133,6 @@ document.addEventListener("click", closeAllSelect);
 
 				gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
 			}
-
-
 </script>
 
 <script type="x-shader/x-fragment" id="fragmentshader">
@@ -155,8 +153,6 @@ document.addEventListener("click", closeAllSelect);
 				gl_FragColor = ( getTexture( baseTexture ) + vec4( 1.0 ) * getTexture( bloomTexture ) );
 
 			}
-
-
 </script>
 <script type="module">
 
