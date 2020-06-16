@@ -576,10 +576,10 @@ document.addEventListener("click", closeAllSelect);
 
     function updateWikipedia(e) {
         let currentLanguage = getSelectedLanguage()
-        if (currentLanguage !== "none") {
-            loadWikipediaPreview(e.target.value, currentLanguage); // currentLanguage
-        } else {
+        if (currentLanguage === "none" || e.target.value === "Select organ:" || e.target.value === "Show all") {
             removeDivByID(".wikipediainfo")
+        } else {
+            loadWikipediaPreview(e.target.value, currentLanguage); // currentLanguage
         }
     }
 
