@@ -573,17 +573,21 @@ document.addEventListener("click", closeAllSelect);
             removeDivByID(".wikipediainfo")
         } else {
             emphasizeOrgan(e.target.value);
-            let currentLanguage = getSelectedLanguage()
-            if (currentLanguage !== "none") {
-                loadWikipediaPreview(e.target.value, currentLanguage); // currentLanguage
-            } else {
-                removeDivByID(".wikipediainfo")
-            }
+            updateWikipedia(e)
+        }
+    }
+
+    function updateWikipedia(e){
+        let currentLanguage = getSelectedLanguage()
+        if (currentLanguage !== "none") {
+            loadWikipediaPreview(e.target.value, currentLanguage); // currentLanguage
+        } else {
+            removeDivByID(".wikipediainfo")
         }
     }
 
     element_selector.addEventListener('change', updateValue);
-    language_selector.addEventListener('change', updateValue);
+    language_selector.addEventListener('change', updateWikipedia);
 
     function resetMaterial() {
         emphasizeOrgan("")
