@@ -18,7 +18,7 @@
 <!--surround the select box with a "custom-select" DIV element. Remember to set the width:-->
 <div class="vertical-menu" style="width:700px; float:right; z-index: 100; position: absolute; right: 0;">
     <select id="Organs">
-        <option value="Select organ:">Select part of organ:</option>
+        <option value="Select part of organ:">Select part of organ:</option>
         <option value="Show all">Show all</option>
     </select>
 
@@ -565,7 +565,7 @@ document.addEventListener("click", closeAllSelect);
     }
 
     function updateValue(e) {
-        if (e.target.value === "Select organ:" || e.target.value === "Show all") {
+        if (e.target.value === "Select part of organ:" || e.target.value === "Show all") {
             resetMaterial();
             removeDivByID(".wikipediainfo")
         } else {
@@ -576,7 +576,9 @@ document.addEventListener("click", closeAllSelect);
 
     function updateWikipedia(e) {
         let currentLanguage = getSelectedLanguage()
-        if (currentLanguage === "none" || e.target.value === "Select organ:" || e.target.value === "Show all") {
+        let selO = document.getElementById("Organs");
+        let selOText = selO.options[selO.selectedIndex].text;
+        if (currentLanguage === "none" || selOText === "Select part of organ:" || selOText === "Show all") {
             removeDivByID(".wikipediainfo")
         } else {
             loadWikipediaPreview(e.target.value, currentLanguage); // currentLanguage
