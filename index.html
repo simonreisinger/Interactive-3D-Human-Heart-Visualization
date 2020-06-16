@@ -181,9 +181,13 @@ document.addEventListener("click", closeAllSelect);
     let darkMaterial = new THREE.MeshBasicMaterial({color: "black"});
     let mouse = new THREE.Vector2();
 
-    function getSelectedLanguage(newLanguage) {
+    function getSelectedLanguage() {
         let sel = document.getElementById("languageSelector");
-        return sel.options[sel.selectedIndex].text;
+        if (sel.options[sel.selectedIndex].text === "none") {
+            return "none"
+        } else {
+            return sel.options[sel.selectedIndex].text;
+        }
     }
 
     const WWOBJLoader2Example = function (elementToBindTo) {
@@ -288,8 +292,6 @@ document.addEventListener("click", closeAllSelect);
             this.finalComposer = new EffectComposer(this.renderer);
             this.finalComposer.addPass(renderScene);
             this.finalComposer.addPass(finalPass);
-
-
         },
 
         useLoadParallel: function (modelInfos, ID, organName) {
@@ -564,12 +566,10 @@ document.addEventListener("click", closeAllSelect);
     let element_selector = document.getElementById("Organs");
     let language_selector = document.getElementById("languageSelector");
 
+    language_selector.add(new Option("none", "none"), undefined);
     for (i in Postnatal_anatomical_structure[0].wikipediaInfos) {
         language_selector.add(new Option(i, i), undefined);
     }
-
-    element_selector.addEventListener('change', updateValue);
-    language_selector.addEventListener('change', updateValue);
 
     function updateValue(e) {
         if (e.target.value === "Select organ:" || e.target.value === "Show all") {
@@ -578,10 +578,16 @@ document.addEventListener("click", closeAllSelect);
         } else {
             emphasizeOrgan(e.target.value);
             let currentLanguage = getSelectedLanguage()
-            console.log(currentLanguage);
-            loadWikipediaPreview(e.target.value, currentLanguage); // currentLanguage
+            if (currentLanguage !== "none") {
+                loadWikipediaPreview(e.target.value, currentLanguage); // currentLanguage
+            } else {
+                removeDivByID(".wikipediainfo")
+            }
         }
     }
+
+    element_selector.addEventListener('change', updateValue);
+    language_selector.addEventListener('change', updateValue);
 
     function resetMaterial() {
         emphasizeOrgan("")
