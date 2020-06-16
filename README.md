@@ -38,7 +38,7 @@ Heart valve | lightblue
 * Make UI more beautiful
 * Add german wikipedia articles
 * Add MIT Lizenz
-* Make App mobile compatible
+* Make App better compatible for mobile 
 * Implement a backlog so COMAND + Z can be used
 * Rename Repo
 * Add Report to repo
