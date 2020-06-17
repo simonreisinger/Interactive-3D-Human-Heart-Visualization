@@ -28,15 +28,6 @@
 <div id="glFullscreen">
     <canvas id="example"></canvas>
 </div>
-<!--
-
-<div id="dat" class="dg ac"></div>
-<div id="info">
-    <a href="https://threejs.org" target="_blank" rel="noopener">three.js</a> - OBJLoader2 usage options<br>Use module
-    workers with Chromium based browser (80+)
-    <div id="feedback"></div>
-</div>
--->
 
 <script> // MENU
 
@@ -168,7 +159,6 @@ document.addEventListener("click", closeAllSelect);
     import {ShaderPass} from './libraries/threejs/examples/jsm/postprocessing/ShaderPass.js';
     import {UnrealBloomPass} from './libraries/threejs/examples/jsm/postprocessing/UnrealBloomPass.js';
 
-
     let ENTIRE_SCENE = 0;
     let BLOOM_SCENE = 1;
 
@@ -261,7 +251,7 @@ document.addEventListener("click", closeAllSelect);
             this.pivot.name = 'Pivot';
             this.scene.add(this.pivot);
 
-            let renderScene = new RenderPass(this.scene, this.camera);
+            let renderPass = new RenderPass(this.scene, this.camera);
 
             let bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
             bloomPass.threshold = this.params.bloomThreshold;
@@ -270,7 +260,7 @@ document.addEventListener("click", closeAllSelect);
 
             this.bloomComposer = new EffectComposer(this.renderer);
             this.bloomComposer.renderToScreen = false;
-            this.bloomComposer.addPass(renderScene);
+            this.bloomComposer.addPass(renderPass);
             this.bloomComposer.addPass(bloomPass);
 
             let finalPass = new ShaderPass(
@@ -287,7 +277,7 @@ document.addEventListener("click", closeAllSelect);
             finalPass.needsSwap = true;
 
             this.finalComposer = new EffectComposer(this.renderer);
-            this.finalComposer.addPass(renderScene);
+            this.finalComposer.addPass(renderPass);
             this.finalComposer.addPass(finalPass);
         },
 
@@ -374,12 +364,12 @@ document.addEventListener("click", closeAllSelect);
         renderBloom: function (mask) {
 
             if (mask === true) {
+                // if the object should not bloom make them black
                 this.scene.traverse(this.darkenNonBloomed);
                 this.bloomComposer.render();
+                // restore correct colors
                 this.scene.traverse(this.restoreMaterial);
-
             } else {
-
                 this.camera.layers.set(BLOOM_SCENE);
                 this.bloomComposer.render();
                 this.camera.layers.set(ENTIRE_SCENE);
@@ -494,6 +484,7 @@ document.addEventListener("click", closeAllSelect);
 
     let partsModels = [];
     let nameAndID = [];
+
     function onDocumentMouseClick(currentName) {
         app.onDocumentMouseClick_object(currentName);
     }
