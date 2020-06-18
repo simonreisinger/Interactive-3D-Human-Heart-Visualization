@@ -1,4 +1,4 @@
-# Interactive 3D heart visualization
+# Interactive 3D Human Heart visualization
 This program was built for the lecture [Visualisierung Medizinischer Daten 2](https://www.cg.tuwien.ac.at/courses/MedVis2/VU.html) at [TU Wien](https://www.cg.tuwien.ac.at).
 
 Visualization [here](https://ippon1.github.io/Medical_Vis/)
