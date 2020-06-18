@@ -36,7 +36,6 @@ Heart valve | lightblue
 
 # TODOs
 * Make UI more beautiful
-* Add german wikipedia articles
 * Add MIT Lizenz
 * Make App better compatible for mobile 
 * Implement a backlog so COMAND + Z can be used
