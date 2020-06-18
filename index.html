@@ -448,6 +448,7 @@ document.addEventListener("click", closeAllSelect);
                 }
                 nameAndID[organName[0]] = currentName;
             }
+            sortlist();
         },
 
         arrayContainsString: function (myArray, value) {
@@ -556,6 +557,36 @@ document.addEventListener("click", closeAllSelect);
         language_selector.add(new Option(i, i), undefined);
     }
 
+    // Source: https://stackoverflow.com/questions/5248189/sort-select-menu-alphabetically
+    function sortlist(){
+
+        var cl = document.getElementById('Organs');
+        var clTexts = new Array();
+
+        for(i = 2; i < cl.length; i++){
+            clTexts[i-2] =
+                cl.options[i].text.toUpperCase() + "," +
+                cl.options[i].text + "," +
+                cl.options[i].value + "," +
+                cl.options[i].selected;
+        }
+
+        clTexts.sort();
+
+        for(i = 2; i < cl.length; i++){
+            var parts = clTexts[i-2].split(',');
+
+            cl.options[i].text = parts[1];
+            cl.options[i].value = parts[2];
+            if(parts[3] == "true"){
+                cl.options[i].selected = true;
+            }else{
+                cl.options[i].selected = false;
+            }
+        }
+    }
+
+
     function updateValue(e) {
         if (e.target.value === "Select part of organ:" || e.target.value === "Show all") {
             resetMaterial();
@@ -567,13 +598,13 @@ document.addEventListener("click", closeAllSelect);
     }
 
     function updateWikipedia(e) {
-        let currentLanguage = getSelectedLanguage()
+        let currentLanguage = getSelectedLanguage();
         let selO = document.getElementById("Organs");
         let selOText = selO.options[selO.selectedIndex].text;
         if (currentLanguage === "none" || selOText === "Select part of organ:" || selOText === "Show all") {
             removeDivByID(".wikipediainfo")
         } else {
-            loadWikipediaPreview(e.target.value, currentLanguage); // currentLanguage
+            loadWikipediaPreview(selOText, currentLanguage); // currentLanguage
         }
     }
 
