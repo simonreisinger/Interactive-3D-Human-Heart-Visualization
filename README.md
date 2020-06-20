@@ -40,5 +40,4 @@ Heart valve | lightblue
 * Make App better compatible for mobile 
 * Implement a backlog so COMAND + Z can be used
 * Rename Repo
-* Add Report to repo
 * Make responsive Web APP
