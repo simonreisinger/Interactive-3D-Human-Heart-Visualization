@@ -41,4 +41,4 @@ Heart valve | lightblue
 * Implement a backlog so COMAND + Z can be used
 * Rename Repo
 * Add Report to repo
-* Make responsive Web APp
+* Make responsive Web APP
