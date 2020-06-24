@@ -8,7 +8,7 @@
     <link type="text/css" rel="stylesheet" href="main.css">
     <script src="./data/Postnatal_anatomical_structure/Postnatal_anatomical_structure.js"></script>
     <script src="./menuStyle.js"></script>
-    <script src="findwikipediaInfos.js"></script>
+    <script src="./findwikipediaInfos.js"></script>
     <script src="./libraries/jquery-3.5.1.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/2.3.1/css/flag-icon.min.css" rel="stylesheet"/>
@@ -365,19 +365,12 @@ document.addEventListener("click", closeAllSelect);
             this.camera.updateProjectionMatrix();
         },
 
-        renderBloom: function (mask) {
-
-            if (mask === true) {
-                // if the object should not bloom make them black
-                this.scene.traverse(this.darkenNonBloomed);
-                this.bloomComposer.render();
-                // restore correct colors
-                this.scene.traverse(this.restoreMaterial);
-            } else {
-                this.camera.layers.set(BLOOM_SCENE);
-                this.bloomComposer.render();
-                this.camera.layers.set(ENTIRE_SCENE);
-            }
+        renderBloom: function () {
+            // if the object should not bloom make them black
+            this.scene.traverse(this.darkenNonBloomed);
+            this.bloomComposer.render();
+            // restore correct colors
+            this.scene.traverse(this.restoreMaterial);
         },
 
         darkenNonBloomed: function (obj) {
@@ -409,24 +402,11 @@ document.addEventListener("click", closeAllSelect);
         render: function () {
             if (!this.renderer.autoClear) this.renderer.clear();
             this.controls.update();
-            // TODO simplify this
-            switch (this.params.scene) {
+            // render scene with bloom
+            this.renderBloom();
 
-                case 'Scene only':
-                    this.renderer.render(this.scene, this.camera);
-                    break;
-                case 'Glow only':
-                    this.renderBloom(false);
-                    break;
-                case 'Scene with Glow':
-                default:
-                    // render scene with bloom
-                    this.renderBloom(true);
-
-                    // render the entire scene, then render bloom scene on top
-                    this.finalComposer.render();
-                    break;
-            }
+            // render the entire scene, then render bloom scene on top
+            this.finalComposer.render();
         },
 
         traverseScene: function (object3d) {
@@ -561,13 +541,13 @@ document.addEventListener("click", closeAllSelect);
         language_selector.add(new Option(i, i), undefined);
     }
 
-    function sortlist(){
+    function sortlist() {
 
         var cl = document.getElementById('Organs');
         var clTexts = new Array();
 
-        for(i = 2; i < cl.length; i++){
-            clTexts[i-2] =
+        for (i = 2; i < cl.length; i++) {
+            clTexts[i - 2] =
                 cl.options[i].text.toUpperCase() + "," +
                 cl.options[i].text + "," +
                 cl.options[i].value + "," +
@@ -576,14 +556,14 @@ document.addEventListener("click", closeAllSelect);
 
         clTexts.sort();
 
-        for(i = 2; i < cl.length; i++){
-            var parts = clTexts[i-2].split(',');
+        for (i = 2; i < cl.length; i++) {
+            var parts = clTexts[i - 2].split(',');
 
             cl.options[i].text = parts[1];
             cl.options[i].value = parts[2];
-            if(parts[3] == "true"){
+            if (parts[3] == "true") {
                 cl.options[i].selected = true;
-            }else{
+            } else {
                 cl.options[i].selected = false;
             }
         }
