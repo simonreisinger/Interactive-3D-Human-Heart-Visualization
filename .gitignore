@@ -1,3 +1,18 @@
-
+# Mac
 .DS_Store
+
+# Intellij
 .idea/
+*.iml
+
+# Latex
+*.toc
+*.aux
+*.loc
+*.log
+*.nav
+*.out
+*.snm
+*.soc
+*.gz
+*.pdf
