@@ -499,7 +499,7 @@ document.addEventListener("click", closeAllSelect);
 
     function changeMaterial(ID, opacity) {
         partsModels[ID].layers.toggle(ENTIRE_SCENE);
-        let materialColor = partsModels[ID].children[0].children[0].material.color; // "rgb(0,255,0)";
+        let materialColor = partsModels[ID].children[0].children[0].material.color;
         let currentOpacity = partsModels[ID].children[0].children[0].material.opacity;
 
         //TODO if already the correct values donot redraw
