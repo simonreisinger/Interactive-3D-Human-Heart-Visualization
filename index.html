@@ -383,18 +383,14 @@ document.addEventListener("click", closeAllSelect);
 
         restoreMaterial: function (obj) {
             if (materials[obj.uuid]) {
-
                 obj.material = materials[obj.uuid];
                 delete materials[obj.uuid];
             }
         },
 
         disposeMaterial: function (obj) {
-
             if (obj.material) {
-
                 obj.material.dispose();
-
             }
 
         },
@@ -443,7 +439,6 @@ document.addEventListener("click", closeAllSelect);
             }
             return false;
         },
-
 
         onDocumentMouseClick_object: function (event) {
             event.preventDefault();
@@ -542,10 +537,8 @@ document.addEventListener("click", closeAllSelect);
     }
 
     function sortlist() {
-
         var cl = document.getElementById('Organs');
         var clTexts = new Array();
-
         for (i = 2; i < cl.length; i++) {
             clTexts[i - 2] =
                 cl.options[i].text.toUpperCase() + "," +
@@ -558,7 +551,6 @@ document.addEventListener("click", closeAllSelect);
 
         for (i = 2; i < cl.length; i++) {
             var parts = clTexts[i - 2].split(',');
-
             cl.options[i].text = parts[1];
             cl.options[i].value = parts[2];
             if (parts[3] == "true") {
