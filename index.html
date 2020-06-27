@@ -375,7 +375,6 @@ document.addEventListener("click", closeAllSelect);
 
         darkenNonBloomed: function (obj) {
             if (obj.isMesh && bloomLayer.test(obj.layers) === false) {
-
                 materials[obj.uuid] = obj.material;
                 obj.material = darkMaterial;
             }
