@@ -3,7 +3,7 @@ This program was built for the lecture [Visualisierung Medizinischer Daten 2](ht
 
 Visualization [here](https://ippon1.github.io/Medical_Vis/)
 
-![Heart](https://ippon1.github.io/Medical_Vis/screenshots/example_heart.png)
+![Heart](./screenshots/example_heart.png)
 
 ## Functionality
 * On the right top corner you can select part of the organ. This will be emphasized and on the right side a fitting wikipedia Article will be added.
@@ -15,7 +15,7 @@ Visualization [here](https://ippon1.github.io/Medical_Vis/)
 * To select and highlight an object and get further informations there is a menu at the top right corner. 
 
 ## Color scheme for the different kinds of anatomical structures
-Organ strucutres | color
+Organ structures | color
 --- | --- 
 Coronary arteries | red
 Pulmonary vein | red
@@ -42,3 +42,4 @@ Heart valve | lightblue
 * Rename Repo
 * Make responsive Web APP
 * Hover menu
+* when resizing keep center in the center

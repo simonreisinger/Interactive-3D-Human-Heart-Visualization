@@ -15,7 +15,7 @@ function loadWikipediaPreview(currentName, language) {
             success: function (data, textStatus, jqXHR) {
                 var markup = data.parse.text["*"]; // raw text
                 markup = markup.replace(/margin-left: 380px;/g, 'margin-left: 0px;');
-                let blurb = $('<div class=\'wikipediainfo\'></div>').html(markup);
+                let blurb = $('<div class=\'wikipediaInfo\'></div>').html(markup);
                 $(blurb).appendTo('body');
             },
             error: function (errorMessage) {

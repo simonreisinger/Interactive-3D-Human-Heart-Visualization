@@ -2,16 +2,26 @@
 <html lang="en">
 <head>
     <title>Heart Visualization</title>
+
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+    <!-- Style -->
     <link type="text/css" rel="stylesheet" href="menu_style.css">
     <link type="text/css" rel="stylesheet" href="main.css">
+
+    <!-- Data -->
     <script src="./data/Postnatal_anatomical_structure/Postnatal_anatomical_structure.js"></script>
-    <script src="./menuStyle.js"></script>
-    <script src="./findwikipediaInfos.js"></script>
+
+    <!-- Code -->
+    <script src="./findWikipediaInfos.js"></script>
+    <!-- <script src="./menuStyle.js"></script> -->
+
+    <!-- Libraries -->
     <script src="./libraries/jquery-3.5.1.min.js"></script>
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/2.3.1/css/flag-icon.min.css" rel="stylesheet"/>
+    <script src="https://kit.fontawesome.com/a076d05399.js"></script>
 </head>
 
 <body>
@@ -23,103 +33,20 @@
 
 <!--surround the select box with a "custom-select" DIV element. Remember to set the width:-->
 <div class="vertical-menu" style="width:700px; float:right; z-index: 100; position: absolute; right: 0;">
-    <select id="Organs">
+    <a href="https://www.github.com/ippon1/Medical_Vis" target="_blank"><i
+            class="fab fa-github-square" id="github-logo"></i></a>
+    <label for="Organs"></label><select id="Organs">
         <option value="Select part of organ:">Select part of organ:</option>
         <option value="Show all">Show all</option>
     </select>
 
-    <select id="languageSelector"> </select>
+    <label for="languageSelector"></label><select id="languageSelector"> </select>
 </div>
 
 <div id="glFullscreen">
-    <canvas id="example"></canvas>
+    <canvas id="heartCanvas"></canvas>
 </div>
 
-<script> // MENU
-
-var x, i, j, l, ll, selElmnt, a, b, c;
-/*look for any elements with the class "custom-select":*/
-x = document.getElementsByClassName("custom-select");
-l = x.length;
-for (i = 0; i < l; i++) {
-    selElmnt = x[i].getElementsByTagName("select")[0];
-    ll = selElmnt.length;
-    /*for each element, create a new DIV that will act as the selected item:*/
-    a = document.createElement("DIV");
-    a.setAttribute("class", "select-selected");
-    a.innerHTML = selElmnt.options[selElmnt.selectedIndex].innerHTML;
-    x[i].appendChild(a);
-    /*for each element, create a new DIV that will contain the option list:*/
-    b = document.createElement("DIV");
-    b.setAttribute("class", "select-items select-hide");
-    for (j = 1; j < ll; j++) {
-        /*for each option in the original select element,
-        create a new DIV that will act as an option item:*/
-        c = document.createElement("DIV");
-        c.innerHTML = selElmnt.options[j].innerHTML;
-        c.addEventListener("click", function (e) {
-            /*when an item is clicked, update the original select box,
-            and the selected item:*/
-            var y, i, k, s, h, sl, yl;
-            s = this.parentNode.parentNode.getElementsByTagName("select")[0];
-            sl = s.length;
-            h = this.parentNode.previousSibling;
-            for (i = 0; i < sl; i++) {
-                if (s.options[i].innerHTML === this.innerHTML) {
-                    s.selectedIndex = i;
-                    h.innerHTML = this.innerHTML;
-                    y = this.parentNode.getElementsByClassName("same-as-selected");
-                    yl = y.length;
-                    for (k = 0; k < yl; k++) {
-                        y[k].removeAttribute("class");
-                    }
-                    this.setAttribute("class", "same-as-selected");
-                    break;
-                }
-            }
-            h.click();
-        });
-        b.appendChild(c);
-    }
-    x[i].appendChild(b);
-    a.addEventListener("click", function (e) {
-        /*when the select box is clicked, close any other select boxes,
-        and open/close the current select box:*/
-        e.stopPropagation();
-        closeAllSelect(this);
-        this.nextSibling.classList.toggle("select-hide");
-        this.classList.toggle("select-arrow-active");
-    });
-}
-
-function closeAllSelect(elmnt) {
-    /*a function that will close all select boxes in the document,
-    except the current select box:*/
-    var x, y, i, xl, yl, arrNo = [];
-    x = document.getElementsByClassName("select-items");
-    y = document.getElementsByClassName("select-selected");
-    xl = x.length;
-    yl = y.length;
-    for (i = 0; i < yl; i++) {
-        if (elmnt === y[i]) {
-            arrNo.push(i)
-        } else {
-            y[i].classList.remove("select-arrow-active");
-        }
-    }
-    for (i = 0; i < xl; i++) {
-        if (arrNo.indexOf(i)) {
-            x[i].classList.add("select-hide");
-        }
-    }
-}
-
-/*if the user clicks anywhere outside the select box,
-then close all select boxes:*/
-document.addEventListener("click", closeAllSelect);
-
-
-</script>
 <script type="x-shader/x-vertex" id="vertexshader">
 
 			varying vec2 vUv;
@@ -164,6 +91,7 @@ document.addEventListener("click", closeAllSelect);
     import {ShaderPass} from './libraries/threejs/examples/jsm/postprocessing/ShaderPass.js';
     import {UnrealBloomPass} from './libraries/threejs/examples/jsm/postprocessing/UnrealBloomPass.js';
 
+    let DEBUG = false;
     let ENTIRE_SCENE = 0;
     let BLOOM_SCENE = 1;
 
@@ -182,14 +110,13 @@ document.addEventListener("click", closeAllSelect);
         }
     }
 
-    const WWOBJLoader2Example = function (elementToBindTo) {
+    const anatomicalStructuresOBJLoader2 = function (elementToBindTo) {
 
         this.params = {
             exposure: 1,
             bloomStrength: 1.3,
             bloomThreshold: 0,
-            bloomRadius: 0,
-            scene: "Scene with Glow"
+            bloomRadius: 0
         };
         this.raycaster = new THREE.Raycaster();
         this.finalComposer = null;
@@ -197,7 +124,7 @@ document.addEventListener("click", closeAllSelect);
         this.bloomComposer = null;
         this.canvas = elementToBindTo;
         this.aspectRatio = 1;
-        this.recalcAspectRatio();
+        this.recalculateAspectRatio();
 
         this.scene = null;
         this.cameraDefaults = {
@@ -220,8 +147,8 @@ document.addEventListener("click", closeAllSelect);
         this.pivot = null;
     };
 
-    WWOBJLoader2Example.prototype = {
-        constructor: WWOBJLoader2Example,
+    anatomicalStructuresOBJLoader2.prototype = {
+        constructor: anatomicalStructuresOBJLoader2,
 
         initGL: function () {
             this.renderer = new THREE.WebGLRenderer({
@@ -240,6 +167,7 @@ document.addEventListener("click", closeAllSelect);
             this.resetCamera();
             this.controls = new TrackballControls(this.camera, this.renderer.domElement);
 
+            // Lights
             let ambientLight = new THREE.AmbientLight(0x404040);
             let directionalLight1 = new THREE.DirectionalLight(0xC0C0C0);
             let directionalLight2 = new THREE.DirectionalLight(0xC0C0C0);
@@ -335,21 +263,24 @@ document.addEventListener("click", closeAllSelect);
             if (event.detail !== null && event.detail !== undefined && event.detail.text) {
                 output = event.detail.text;
             }
-            console.log('Progress: ' + output);
+            if (DEBUG) {
+                console.log('Progress: ' + output);
+            }
         },
 
         resizeDisplayGL: function () {
-            // TODO edit here
-            console.log("resizeDisplayGL")
+            if (DEBUG) {
+                console.log("resizeDisplayGL")
+            }
             this.controls.handleResize();
-            this.recalcAspectRatio();
+            this.recalculateAspectRatio();
             this.updateCamera();
             this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight, false);
             this.bloomComposer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
             this.finalComposer.setSize(this.canvas.clientWidth, this.canvas.clientHeight);
         },
 
-        recalcAspectRatio: function () {
+        recalculateAspectRatio: function () {
             this.aspectRatio = this.canvas.clientWidth / this.canvas.clientHeight;
         },
 
@@ -404,18 +335,6 @@ document.addEventListener("click", closeAllSelect);
             this.finalComposer.render();
         },
 
-        traverseScene: function (object3d) {
-            if (Array.isArray(object3d.material)) {
-                let currentMaterials = object3d.material.materials;
-                for (let name in currentMaterials) {
-
-                    if (currentMaterials.hasOwnProperty(name)) this.traversalFunction(currentMaterials[name]);
-                }
-            } else if (object3d.material) {
-                this.traversalFunction(object3d.material);
-            }
-        },
-
         executeLoading: function () {
             let menu = document.getElementById("Organs");
             for (let currentObject in Postnatal_anatomical_structure) {
@@ -427,7 +346,7 @@ document.addEventListener("click", closeAllSelect);
                 }
                 nameAndID[organName[0]] = currentName;
             }
-            sortlist();
+            sortList();
         },
 
         arrayContainsString: function (myArray, value) {
@@ -449,7 +368,7 @@ document.addEventListener("click", closeAllSelect);
             let intersects = this.raycaster.intersectObjects(this.pivot.children, true);
 
             if (intersects.length > 0) {
-                for (i in intersects) {
+                for (let i in intersects) {
                     let object = intersects[i].object;
                     if (object.visible) {
                         object.visible = false;
@@ -512,13 +431,12 @@ document.addEventListener("click", closeAllSelect);
         let materialColor = object.material.color;
         let currentOpacity = object.material.opacity;
 
-        let material = new MeshPhongMaterial({
+        object.material = new MeshPhongMaterial({
             color: materialColor,
             opacity: opacity,
             transparent: true,
             depthTest: true
         });
-        object.material = material;
         object.geometry.uvsNeedUpdate = true;
         object.needsUpdate = true;
     }
@@ -531,14 +449,15 @@ document.addEventListener("click", closeAllSelect);
     let language_selector = document.getElementById("languageSelector");
 
     language_selector.add(new Option("none", "none"), undefined);
-    for (i in Postnatal_anatomical_structure[0].wikipediaInfos) {
+    for (let i in Postnatal_anatomical_structure[0].wikipediaInfos) {
         language_selector.add(new Option(i, i), undefined);
     }
 
-    function sortlist() {
-        var cl = document.getElementById('Organs');
-        var clTexts = new Array();
-        for (i = 2; i < cl.length; i++) {
+    function sortList() {
+        let cl = document.getElementById('Organs');
+        let clTexts = [];
+        console.log(cl)
+        for (let i = 2; i < cl.length; i++) {
             clTexts[i - 2] =
                 cl.options[i].text.toUpperCase() + "," +
                 cl.options[i].text + "," +
@@ -548,23 +467,19 @@ document.addEventListener("click", closeAllSelect);
 
         clTexts.sort();
 
-        for (i = 2; i < cl.length; i++) {
-            var parts = clTexts[i - 2].split(',');
+        for (let i = 2; i < cl.length; i++) {
+            let parts = clTexts[i - 2].split(',');
             cl.options[i].text = parts[1];
             cl.options[i].value = parts[2];
-            if (parts[3] == "true") {
-                cl.options[i].selected = true;
-            } else {
-                cl.options[i].selected = false;
-            }
+            cl.options[i].selected = parts[3] === "true";
+
         }
     }
-
 
     function updateValue(e) {
         if (e.target.value === "Select part of organ:" || e.target.value === "Show all") {
             resetMaterial();
-            removeDivByID(".wikipediainfo")
+            removeDivByID(".wikipediaInfo")
         } else {
             emphasizeOrgan(e.target.value);
             updateWikipedia(e)
@@ -576,7 +491,7 @@ document.addEventListener("click", closeAllSelect);
         let selO = document.getElementById("Organs");
         let selOText = selO.options[selO.selectedIndex].text;
         if (currentLanguage === "none" || selOText === "Select part of organ:" || selOText === "Show all") {
-            removeDivByID(".wikipediainfo")
+            removeDivByID(".wikipediaInfo")
         } else {
             loadWikipediaPreview(selOText, currentLanguage); // currentLanguage
         }
@@ -590,7 +505,7 @@ document.addEventListener("click", closeAllSelect);
         changeAllMaterial(1.0)
     }
 
-    let app = new WWOBJLoader2Example(document.getElementById('example'));
+    let app = new anatomicalStructuresOBJLoader2(document.getElementById('heartCanvas'));
 
     function resizeWindow() {
         app.resizeDisplayGL();
@@ -603,8 +518,9 @@ document.addEventListener("click", closeAllSelect);
 
     window.addEventListener('resize', resizeWindow, false);
     window.addEventListener('click', onDocumentMouseClick, false);
-
-    console.log('Starting initialisation phase...');
+    if (DEBUG) {
+        console.log('Starting initialisation phase...');
+    }
     app.initGL();
     app.resizeDisplayGL();
 
