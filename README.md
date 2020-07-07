@@ -29,10 +29,17 @@ right and left Auricle | #ffc0a1
 Heart valve | lightblue
 
 # Sources:
+## Libraries
 * [threejs](https://threejs.org/)
 * [jquery](https://jquery.com/)
 * [Wikipedia](https://en.wikipedia.org)
 * Model: BodyParts3D, © The Database Center for Life Science licensed under CC Attribution-Share Alike 2.1 Japan ([Link](http://lifesciencedb.jp/bp3d/?fbclid=IwAR1KWPydXGal56TpQECD6nJsdcyhLHbElKpUotss5UFEw22KZFBliX3ugtY))
+
+## Tutorials
+* [Menu](https://stackoverflow.com/questions/22896144/drop-down-menu-not-work)
+* [Sort Menu](https://stackoverflow.com/questions/5248189/sort-select-menu-alphabetically)
+* [Object Loader](https://threejs.org/examples/webgl_loader_obj2_options)
+* [Bloom Effect](https://threejs.org/examples/webgl_postprocessing_unreal_bloom_selective)
 
 # TODOs
 * Make UI more beautiful
