@@ -226,19 +226,6 @@
             this.finalComposer = new EffectComposer(this.renderer);
             this.finalComposer.addPass(renderPass);
             this.finalComposer.addPass(finalPass);
-
-
-            // TODO remove this
-            let sphereGeometry = new THREE.SphereBufferGeometry(1, 32, 32);
-            let sphereMaterial = new THREE.MeshBasicMaterial({color: 0xff0000});
-
-            for (let i = 0; i < 40; i++) {
-
-                let sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-                this.scene.add(sphere);
-                this.spheres.push(sphere);
-
-            }
         },
 
         useLoadParallel: function (modelInfos, ID, organName) {
@@ -380,23 +367,6 @@
                     hoverInfo.attr('style', 'visibility: hide')
                     this.INTERSECTED = null;
                 }
-
-                /*/ TODO remove this
-                let intersection = (intersects.length) > 0 ? intersects[0] : null;
-                if (this.toggle > 0.02 && intersection != null) {
-                    this.spheres[this.spheresIndex].position.copy(intersection.point);
-                    this.spheres[this.spheresIndex].scale.set(1, 1, 1);
-                    this.spheresIndex = (this.spheresIndex + 1) % this.spheres.length;
-                    this.toggle = 0;
-
-                }
-                for (let i = 0; i < this.spheres.length; i++) {
-                    let sphere = this.spheres[i];
-                    sphere.scale.multiplyScalar(0.98);
-                    sphere.scale.clampScalar(0.01, 1);
-                }
-                this.toggle += 10; // clock.getDelta();
-                // TODO remove this */
             }
         },
 

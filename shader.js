@@ -1,2 +1,1 @@
-
-console.log(fragmentShader)
+// TODO move shaders to this file
