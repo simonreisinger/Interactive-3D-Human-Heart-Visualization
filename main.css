@@ -58,18 +58,12 @@ button {
     text-transform: uppercase;
 }
 
-canvas {
-    height: 100%;
-    width: 100%;
-    margin: 0;
-}
-
-
 a, button, input, select {
     pointer-events: auto;
 }
 
 #glFullscreen {
+    display: block;
     min-width: 100%;
     min-height: 100%;
     width: 100%;
@@ -79,10 +73,21 @@ a, button, input, select {
     z-index: 0;
 }
 
+/*TODO change size to 100% */
 #heartCanvas {
-    min-width: 100%;
-    min-height: 100%;
+    display: inline-block;
+    min-height: 100%; /*px;*/
+    min-width: 100%; /*px;*/
+    margin: 0;
     top: 0;
     left: 0;
     background-color: #000000;
+}
+
+.structure_name {
+    position: absolute;
+    background: #ccc;
+    padding: 30px;
+    text-align: center;
+    visibility: hidden;
 }
