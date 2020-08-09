@@ -104,7 +104,10 @@
     let DEBUG = false;
     let ENTIRE_SCENE = 0;
     let BLOOM_SCENE = 1;
-    let showFurtherInformation = true;
+    var showFurtherInformation = true;
+    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+        showFurtherInformation = false;
+    }
 
     let bloomLayer = new THREE.Layers();
     bloomLayer.set(BLOOM_SCENE);
@@ -338,7 +341,6 @@
             }
 
         },
-
 
         render: function () {
             if (!this.renderer.autoClear) this.renderer.clear();
