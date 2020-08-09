@@ -110,7 +110,7 @@
     bloomLayer.set(BLOOM_SCENE);
     let materials = {};
     let darkMaterial = new THREE.MeshBasicMaterial({color: "black"});
-    let mouse = new THREE.Vector2();
+    let mouse = new THREE.Vector2(0, 0);
 
     function getSelectedLanguage() {
         let sel = document.getElementById("languageSelector");
@@ -191,9 +191,9 @@
             directionalLight1.position.set(-100, -50, 100);
             directionalLight2.position.set(100, 50, -100);
 
+            this.scene.add(ambientLight);
             this.scene.add(directionalLight1);
             this.scene.add(directionalLight2);
-            this.scene.add(ambientLight);
 
             this.pivot = new THREE.Object3D();
             this.pivot.name = 'Pivot';
@@ -230,7 +230,6 @@
 
         useLoadParallel: function (modelInfos, ID, organName) {
             let modelName = modelInfos.Filename;
-            let color = modelInfos.Class;
             const testFolder = './data/Postnatal_anatomical_structure/';
             this._reportProgress({detail: {text: 'Loading: ' + organName}});
 
@@ -265,7 +264,6 @@
             objLoader2Parallel.load(testFolder + modelName, callbackOnLoad);
             partsModels[ID] = local;
         },
-
 
         finalize: function () {
             this.loadCount--;
@@ -341,6 +339,7 @@
 
         },
 
+
         render: function () {
             if (!this.renderer.autoClear) this.renderer.clear();
             this.controls.update();
@@ -362,7 +361,6 @@
                         hoverInfo.html(this.INTERSECTED.userData.name);
                         hoverInfo.attr('style', 'visibility: visible'); // 'visibility: visible'
                     }
-
                 } else {
                     hoverInfo.attr('style', 'visibility: hide')
                     this.INTERSECTED = null;
@@ -392,7 +390,6 @@
             }
             return false;
         },
-
 
         onDocumentMouseMove: function (event) {
             event.preventDefault();
@@ -439,7 +436,7 @@
         app.onDocumentMouseMove(event);
     }
 
-    var oldName = ""
+    let oldName = ""
 
     function emphasizeOrgan(currentName) {
         changeAllMaterial(1.0);
@@ -465,23 +462,20 @@
     function changeMaterial(ID, opacity) {
         partsModels[ID].layers.toggle(ENTIRE_SCENE);
         let materialColor = partsModels[ID].children[0].children[0].material.color;
-        let currentOpacity = partsModels[ID].children[0].children[0].material.opacity;
 
-        //TODO if already the correct values donot redraw
-        let material = new MeshPhongMaterial({
+        //TODO if already the correct values do not redraw
+        partsModels[ID].children[0].children[0].material = new MeshPhongMaterial({
             color: materialColor,
             opacity: opacity,
             transparent: true,
             depthTest: true
         });
-        partsModels[ID].children[0].children[0].material = material;
         partsModels[ID].children[0].children[0].geometry.uvsNeedUpdate = true;
         partsModels[ID].needsUpdate = true;
     }
 
     function changeMaterialOfObject(object, opacity) {
         let materialColor = object.material.color;
-        let currentOpacity = object.material.opacity;
 
         object.material = new MeshPhongMaterial({
             color: materialColor,
@@ -506,7 +500,7 @@
     }
 
     function sortList() {
-        let cl = document.getElementById('Organs');
+        let cl = document.getElementById("Organs");
         let clTexts = [];
         for (let i = 2; i < cl.length; i++) {
             clTexts[i - 2] =
@@ -515,9 +509,7 @@
                 cl.options[i].value + "," +
                 cl.options[i].selected;
         }
-
         clTexts.sort();
-
         for (let i = 2; i < cl.length; i++) {
             let parts = clTexts[i - 2].split(',');
             cl.options[i].text = parts[1];
@@ -532,11 +524,11 @@
             removeDivByID(".wikipediaInfo")
         } else {
             emphasizeOrgan(e.target.value);
-            updateWikipedia(e)
+            updateWikipedia()
         }
     }
 
-    function updateWikipedia(e) {
+    function updateWikipedia() {
         let currentLanguage = getSelectedLanguage();
         let selO = document.getElementById("Organs");
         let selOText = selO.options[selO.selectedIndex].text;
@@ -580,8 +572,6 @@
     render();
     app.executeLoading();
 
-
 </script>
-
 </body>
 </html>
