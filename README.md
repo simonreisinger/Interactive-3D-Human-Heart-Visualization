@@ -42,6 +42,7 @@ Heart valve | lightblue
 * [Bloom Effect](https://threejs.org/examples/webgl_postprocessing_unreal_bloom_selective)
 
 # TODOs
+* Remove Structure instead of just hide
 * Make UI more beautiful
 * Add MIT Lizenz
 * Make App better compatible for mobile 

@@ -356,10 +356,15 @@
                 let hoverInfo = $('.structure_name');
                 if (intersects.length > 0) {
                     let nearestObj = this.getClosestVisibleObject(intersects)
-                    if (nearestObj !== null && this.INTERSECTED !== nearestObj) {
-                        this.INTERSECTED = nearestObj;
-                        hoverInfo.html(this.INTERSECTED.userData.name);
-                        hoverInfo.attr('style', 'visibility: visible'); // 'visibility: visible'
+                    if (nearestObj !== null) {
+                        if (this.INTERSECTED !== nearestObj) {
+                            this.INTERSECTED = nearestObj;
+                            hoverInfo.html(this.INTERSECTED.userData.name);
+                            hoverInfo.css('visibility', 'visible');
+                        }
+                    } else {
+                        hoverInfo.attr('style', 'visibility: hide')
+                        this.INTERSECTED = null;
                     }
                 } else {
                     hoverInfo.attr('style', 'visibility: hide')
@@ -423,7 +428,6 @@
             }
         }
     };
-
 
     let partsModels = [];
     let nameAndID = [];
