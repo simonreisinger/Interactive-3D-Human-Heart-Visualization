@@ -29,7 +29,7 @@ right and left Auricle | #ffc0a1
 Heart valve | lightblue
 
 # Sources:
-## Libraries
+## Libraries and Data
 * [threejs](https://threejs.org/)
 * [jquery](https://jquery.com/)
 * [Wikipedia](https://en.wikipedia.org)
