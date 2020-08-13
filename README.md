@@ -47,7 +47,5 @@ Heart valve | lightblue
 * Add MIT Lizenz
 * Make App better compatible for mobile 
 * Implement a backlog so COMAND + Z can be used
-* Rename Repo
 * Make responsive Web APP
-* Hover menu
-* when resizing keep center in the center
+* When resizing keep center in the center
