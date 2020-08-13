@@ -1,5 +1,4 @@
 # Interactive 3D Human Heart Visualization
-This program was built for the lecture [Visualisierung Medizinischer Daten 2](https://www.cg.tuwien.ac.at/courses/MedVis2/VU.html) at [TU Wien](https://www.cg.tuwien.ac.at).
 
 Visualization [here](https://ippon1.github.io/Interactive-3D-Human-Heart-Visualization/)
 
@@ -49,3 +48,6 @@ Heart valve | lightblue
 * Implement a backlog so COMAND + Z can be used
 * Make responsive Web APP
 * When resizing keep center in the center
+
+## Acknowledgment
+This project was created for the course [Visualisierung Medizinischer Daten 2](https://www.cg.tuwien.ac.at/courses/MedVis2/VU.html) at [TU Wien](https://www.cg.tuwien.ac.at).
