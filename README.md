@@ -50,6 +50,7 @@ Heart valve | lightblue
 * When resizing keep center in the center
 * https://github.com/shama/webpack-stream
 * https://gulpjs.com/
+* https://classic.yarnpkg.com/en/
 
 ## Acknowledgment
 This project was created for the course [Visualisierung Medizinischer Daten 2](https://www.cg.tuwien.ac.at/courses/MedVis2/VU.html) at [TU Wien](https://www.cg.tuwien.ac.at). It was rewarded full points.
