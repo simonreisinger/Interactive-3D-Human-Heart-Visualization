@@ -16,3 +16,4 @@
 *.soc
 *.gz
 *.pdf
+node_modules/
