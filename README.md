@@ -1,7 +1,7 @@
 # Interactive 3D Human Heart Visualization
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-Visualization [here](https://ippon1.github.io/Interactive-3D-Human-Heart-Visualization/)
+Visualization [here](https://simonreisinger.github.io/Interactive-3D-Human-Heart-Visualization/)
 
 ![Heart](./screenshots/example_heart.png)
 
