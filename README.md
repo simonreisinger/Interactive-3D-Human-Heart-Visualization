@@ -41,18 +41,5 @@ Heart valve | lightblue
 * [Object Loader](https://threejs.org/examples/webgl_loader_obj2_options)
 * [Bloom Effect](https://threejs.org/examples/webgl_postprocessing_unreal_bloom_selective)
 
-# TODOs
-* Optimize for [Safari](https://www.apple.com/safari)
-* Remove Structure instead of just hide
-* Make UI more beautiful
-* Add MIT Lizenz
-* Make App better compatible for mobile 
-* Implement a backlog so COMAND + Z can be used
-* Make responsive Web APP
-* When resizing keep center in the center
-* https://github.com/shama/webpack-stream
-* https://gulpjs.com/
-* https://classic.yarnpkg.com/en/
-
 ## Acknowledgment
 This project was created for the course [Visualisierung Medizinischer Daten 2](https://www.cg.tuwien.ac.at/courses/MedVis2/VU.html) at [TU Wien](https://www.cg.tuwien.ac.at). It was rewarded full points.
